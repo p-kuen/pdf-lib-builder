@@ -1,13 +1,20 @@
 import {
+  addRandomSuffix,
+  BlendMode,
   breakTextIntoLines,
   cleanText,
+  Color,
   lineSplit,
+  PDFContentStream,
   PDFDocument,
   PDFFont,
   PDFImage,
+  PDFName,
+  PDFOperator,
   PDFPage,
   PDFPageDrawImageOptions,
   PDFPageDrawTextOptions,
+  PDFRef,
   rgb,
   StandardFonts,
 } from "pdf-lib";
@@ -36,13 +43,19 @@ export default class PDFDocumentBuilder {
   doc: PDFDocument;
   page: PDFPage;
   options: PDFDocumentBuilderOptions;
+
   font: PDFFont;
+  private fontKey?: string;
 
   fontSize = 24;
+  fontColor: Color = rgb(0, 0, 0);
   lineHeightFactor = 1.3;
   lineHeight = 24;
 
   pageIndex = 0;
+
+  contentStream?: PDFContentStream;
+  contentStreamRef?: PDFRef;
 
   constructor(doc: PDFDocument, options?: Partial<PDFDocumentBuilderOptions>) {
     this.doc = doc;
@@ -71,7 +84,16 @@ export default class PDFDocumentBuilder {
 
   setFont(font: PDFFont) {
     this.font = font;
-    this.page.setFont(font);
+    this.fontKey = addRandomSuffix(this.font.name);
+    this.page.node.setFontDictionary(PDFName.of(this.fontKey), this.font.ref);
+  }
+
+  getFont(): [PDFFont, string] {
+    if (!this.font || !this.fontKey) {
+      const font = this.doc.embedStandardFont(StandardFonts.Helvetica);
+      this.setFont(font);
+    }
+    return [this.font!, this.fontKey!];
   }
 
   setFontSize(size: number) {
@@ -89,18 +111,24 @@ export default class PDFDocumentBuilder {
     const defaultOptions: PDFPageDrawTextOptions = {
       maxWidth: Infinity,
     };
-    const opts = Object.assign(defaultOptions, options);
-    opts.maxWidth = Math.min(opts.maxWidth || Infinity, this.page.getWidth() - this.x - this.options.margins.right);
+    options = Object.assign(defaultOptions, options);
+    options.maxWidth = Math.min(
+      options.maxWidth || Infinity,
+      this.page.getWidth() - this.x - this.options.margins.right
+    );
+    const [originalFont] = this.getFont();
+    if (options.font) this.setFont(options.font);
+    const [font] = this.getFont();
 
-    const wordBreaks = opts.wordBreaks || this.doc.defaultWordBreaks;
-    const fontSize = opts.size || this.fontSize;
+    const wordBreaks = options.wordBreaks || this.doc.defaultWordBreaks;
+    const fontSize = options.size || this.fontSize;
     const lineHeight = fontSize * this.lineHeightFactor;
-    // opts.lineHeight = fontSize * this.lineHeightFactor;
-    const textWidth = (t: string) => this.font.widthOfTextAtSize(t, fontSize);
+    // options.lineHeight = fontSize * this.lineHeightFactor;
+    const textWidth = (t: string) => font.widthOfTextAtSize(t, fontSize);
     const textLines =
-      opts.maxWidth === undefined
+      options.maxWidth === undefined
         ? lineSplit(cleanText(text))
-        : breakTextIntoLines(text, wordBreaks, opts.maxWidth, textWidth);
+        : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
 
     // at this point, let's check if there is enough space for the lines on this page
     if (this.y + lineHeight * textLines.length > this.maxY) {
@@ -112,9 +140,11 @@ export default class PDFDocumentBuilder {
     // since the origin is on the bottom left we have to adjust the y by the text height
     this.page.moveDown(lineHeight);
 
-    this.page.drawText(text, opts);
+    this.page.drawText(text, options);
 
     this.page.moveDown(lineHeight * (textLines.length - 1));
+
+    if (options.font) this.setFont(originalFont);
   }
 
   async image(
@@ -164,7 +194,11 @@ export default class PDFDocumentBuilder {
   hexColor(hex: string) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
-      ? rgb(parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255)
+      ? rgb(
+          parseInt(result[1], 16) / 255,
+          parseInt(result[2], 16) / 255,
+          parseInt(result[3], 16) / 255
+        )
       : rgb(0, 0, 0);
   }
 
@@ -180,6 +214,11 @@ export default class PDFDocumentBuilder {
   addPage() {
     this.page = this.doc.addPage();
     this.pageIndex++;
+  }
+
+  setFontColor(fontColor: Color) {
+    this.fontColor = fontColor;
+    this.page.setFontColor(fontColor);
   }
 
   get isLastPage() {
@@ -203,6 +242,53 @@ export default class PDFDocumentBuilder {
   }
 
   get maxY() {
-    return this.page.getHeight() - this.options.margins.top - this.options.margins.bottom;
+    return (
+      this.page.getHeight() -
+      this.options.margins.top -
+      this.options.margins.bottom
+    );
+  }
+
+  getContentStream(useExisting = true) {
+    if (useExisting && this.contentStream) return this.contentStream;
+    this.contentStream = this.createContentStream();
+    this.contentStreamRef = this.doc.context.register(this.contentStream);
+    this.page.node.addContentStream(this.contentStreamRef);
+    return this.contentStream;
+  }
+
+  private createContentStream(...operators: PDFOperator[]): PDFContentStream {
+    const dict = this.doc.context.obj({});
+    const contentStream = PDFContentStream.of(dict, operators);
+    return contentStream;
+  }
+
+  private maybeEmbedGraphicsState(options: {
+    opacity?: number;
+    borderOpacity?: number;
+    blendMode?: BlendMode;
+  }): string | undefined {
+    const { opacity, borderOpacity, blendMode } = options;
+
+    if (
+      opacity === undefined &&
+      borderOpacity === undefined &&
+      blendMode === undefined
+    ) {
+      return undefined;
+    }
+
+    const key = addRandomSuffix("GS", 10);
+
+    const graphicsState = this.doc.context.obj({
+      Type: "ExtGState",
+      ca: opacity,
+      CA: borderOpacity,
+      BM: blendMode,
+    });
+
+    this.page.node.setExtGState(PDFName.of(key), graphicsState);
+
+    return key;
   }
 }
