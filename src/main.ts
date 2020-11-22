@@ -4,6 +4,9 @@ import {
   breakTextIntoLines,
   cleanText,
   Color,
+  degrees,
+  drawLinesOfText,
+  drawText,
   lineSplit,
   PDFContentStream,
   PDFDocument,
@@ -118,31 +121,62 @@ export default class PDFDocumentBuilder {
     );
     const [originalFont] = this.getFont();
     if (options.font) this.setFont(options.font);
-    const [font] = this.getFont();
+    const [font, fontKey] = this.getFont();
 
     const wordBreaks = options.wordBreaks || this.doc.defaultWordBreaks;
     const fontSize = options.size || this.fontSize;
-    const lineHeight = fontSize * this.lineHeightFactor;
-    // options.lineHeight = fontSize * this.lineHeightFactor;
     const textWidth = (t: string) => font.widthOfTextAtSize(t, fontSize);
     const textLines =
       options.maxWidth === undefined
         ? lineSplit(cleanText(text))
         : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
 
-    // at this point, let's check if there is enough space for the lines on this page
-    if (this.y + lineHeight * textLines.length > this.maxY) {
-      this.isLastPage ? this.addPage() : this.switchToPage(this.pageIndex + 1);
-      this.moveTo(this.options.margins.left, this.options.margins.top);
-      this.setFontSize(this.fontSize);
+    const encodedLines = textLines.map((text) => font.encodeText(text));
+
+    let contentStream = this.getContentStream();
+
+    const color = options.color || this.fontColor;
+    const size = options.size || fontSize;
+    const rotate = options.rotate || degrees(0);
+    const xSkew = options.xSkew || degrees(0);
+    const ySkew = options.ySkew || degrees(0);
+    const lineHeight = options.lineHeight || this.lineHeight;
+
+    let graphicsStateKey = this.maybeEmbedGraphicsState({
+      opacity: options.opacity,
+      blendMode: options.blendMode,
+    });
+
+    let i = 0;
+    for (const line of encodedLines) {
+      if (this.y + lineHeight > this.maxY) {
+        this.nextPage();
+        this.moveTo(this.options.margins.left, this.options.margins.top);
+        this.setFontSize(this.fontSize);
+        contentStream = this.getContentStream();
+        graphicsStateKey = this.maybeEmbedGraphicsState({
+          opacity: options.opacity,
+          blendMode: options.blendMode,
+        });
+      }
+
+      this.page.moveDown(lineHeight);
+
+      const operators = drawText(line, {
+        color,
+        font: fontKey,
+        size,
+        rotate,
+        xSkew,
+        ySkew,
+        x: options.x || this.page.getX(),
+        y: options.y ? this.page.getHeight() - options.y : this.page.getY(),
+        graphicsState: graphicsStateKey,
+      });
+
+      contentStream.push(...operators);
+      i++;
     }
-
-    // since the origin is on the bottom left we have to adjust the y by the text height
-    this.page.moveDown(lineHeight);
-
-    this.page.drawText(text, options);
-
-    this.page.moveDown(lineHeight * (textLines.length - 1));
 
     if (options.font) this.setFont(originalFont);
   }
@@ -176,7 +210,7 @@ export default class PDFDocumentBuilder {
 
     // at this point, let's check if there is enough space for the lines on this page
     if (this.y + (options?.height || image.height) > this.maxY) {
-      this.isLastPage ? this.addPage() : this.switchToPage(this.pageIndex + 1);
+      this.nextPage();
       this.moveTo(this.options.margins.left, this.options.margins.top);
       this.setFontSize(this.fontSize);
     }
@@ -184,7 +218,7 @@ export default class PDFDocumentBuilder {
     // because the origin is on the bottom left, let's first move down by the image height
     this.page.moveDown(options?.height || image.height);
 
-    this.page.drawImage(image, options);
+    // this.page.drawImage(image, options);
   }
 
   moveTo(x: number, y: number) {
@@ -208,12 +242,26 @@ export default class PDFDocumentBuilder {
     }
 
     this.page = this.doc.getPage(index);
+    this.contentStream = undefined;
+    this.contentStreamRef = undefined;
     this.pageIndex = index;
   }
 
   addPage() {
     this.page = this.doc.addPage();
+    this.contentStream = undefined;
+    this.contentStreamRef = undefined;
     this.pageIndex++;
+  }
+
+  nextPage() {
+    if (this.isLastPage) {
+      console.log("add a new page");
+      this.addPage();
+    } else {
+      console.log("switch to next page");
+      this.switchToPage(this.pageIndex + 1);
+    }
   }
 
   setFontColor(fontColor: Color) {
