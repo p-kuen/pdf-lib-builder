@@ -27,8 +27,8 @@ interface PDFDocumentBuilderOptions {
 
 interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions {
   fit?: {
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
   };
 }
 
@@ -117,7 +117,10 @@ export default class PDFDocumentBuilder {
     this.page.moveDown(lineHeight * (textLines.length - 1));
   }
 
-  async image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions) {
+  async image(
+    input: string | PDFImage,
+    options?: PDFBuilderPageDrawImageOptions
+  ) {
     let image: PDFImage;
 
     if (typeof input !== "string") {
@@ -128,13 +131,17 @@ export default class PDFDocumentBuilder {
     }
 
     if (options?.fit) {
-      const fitDims = image.scaleToFit(options.fit.width, options.fit.height);
+      const fitDims = image.scaleToFit(
+        options.fit.width || image.width,
+        options.fit.height || image.height
+      );
       options.width = fitDims.width;
       options.height = fitDims.height;
     }
 
     if (options?.y) {
-      options.y = this.page.getHeight() - options.y - (options.height || image.height);
+      options.y =
+        this.page.getHeight() - options.y - (options.height || image.height);
     }
 
     // at this point, let's check if there is enough space for the lines on this page
@@ -143,6 +150,9 @@ export default class PDFDocumentBuilder {
       this.moveTo(this.options.margins.left, this.options.margins.top);
       this.setFontSize(this.fontSize);
     }
+
+    // because the origin is on the bottom left, let's first move down by the image height
+    this.page.moveDown(options?.height || image.height);
 
     this.page.drawImage(image, options);
   }
