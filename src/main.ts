@@ -187,10 +187,7 @@ export default class PDFDocumentBuilder {
     if (options.font) this.setFont(originalFont);
   }
 
-  async image(
-    input: string | PDFImage,
-    options?: PDFBuilderPageDrawImageOptions
-  ) {
+  async image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions) {
     let image: PDFImage;
 
     if (typeof input !== "string") {
@@ -201,17 +198,13 @@ export default class PDFDocumentBuilder {
     }
 
     if (options?.fit) {
-      const fitDims = image.scaleToFit(
-        options.fit.width || image.width,
-        options.fit.height || image.height
-      );
+      const fitDims = image.scaleToFit(options.fit.width || image.width, options.fit.height || image.height);
       options.width = fitDims.width;
       options.height = fitDims.height;
     }
 
     if (options?.y) {
-      options.y =
-        this.page.getHeight() - options.y - (options.height || image.height);
+      options.y = this.page.getHeight() - options.y - (options.height || image.height);
     }
 
     // at this point, let's check if there is enough space for the lines on this page
@@ -224,7 +217,7 @@ export default class PDFDocumentBuilder {
     // because the origin is on the bottom left, let's first move down by the image height
     this.page.moveDown(options?.height || image.height);
 
-    // this.page.drawImage(image, options);
+    this.page.drawImage(image, options);
   }
 
   moveTo(x: number, y: number) {
@@ -234,11 +227,7 @@ export default class PDFDocumentBuilder {
   hexColor(hex: string) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
-      ? rgb(
-          parseInt(result[1], 16) / 255,
-          parseInt(result[2], 16) / 255,
-          parseInt(result[3], 16) / 255
-        )
+      ? rgb(parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255)
       : rgb(0, 0, 0);
   }
 
@@ -294,11 +283,7 @@ export default class PDFDocumentBuilder {
   }
 
   get maxY() {
-    return (
-      this.page.getHeight() -
-      this.options.margins.top -
-      this.options.margins.bottom
-    );
+    return this.page.getHeight() - this.options.margins.top - this.options.margins.bottom;
   }
 
   getContentStream(useExisting = true) {
@@ -322,11 +307,7 @@ export default class PDFDocumentBuilder {
   }): string | undefined {
     const { opacity, borderOpacity, blendMode } = options;
 
-    if (
-      opacity === undefined &&
-      borderOpacity === undefined &&
-      blendMode === undefined
-    ) {
+    if (opacity === undefined && borderOpacity === undefined && blendMode === undefined) {
       return undefined;
     }
 
