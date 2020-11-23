@@ -1,0 +1,20 @@
+{
+  "name": "pdf-lib-builder",
+  "version": "1.0.0",
+  "description": "A builder based on pdf-lib",
+  "main": "build/main.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "tsc-watch --onSuccess \"node build/server.js\""
+  },
+  "author": "Patrick Kuen <p.kuen@cloudacy.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^14.14.9",
+    "tsc-watch": "^4.2.9",
+    "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "pdf-lib-builder": "link:.."
+  }
+}
