@@ -121,7 +121,7 @@ export default class PDFDocumentBuilder {
     );
     const [originalFont] = this.getFont();
     if (options.font) this.setFont(options.font);
-    const [font, fontKey] = this.getFont();
+    let [font, fontKey] = this.getFont();
 
     const wordBreaks = options.wordBreaks || this.doc.defaultWordBreaks;
     const fontSize = options.size || this.fontSize;
@@ -151,9 +151,15 @@ export default class PDFDocumentBuilder {
     for (const line of encodedLines) {
       if (this.y + lineHeight > this.maxY) {
         this.nextPage();
+
+        // Add font to directory on the new page and get the font key
+        this.setFont(font);
+        [font, fontKey] = this.getFont();
+
+        // Move to the top of the new page
         this.moveTo(this.options.margins.left, this.options.margins.top);
         this.setFontSize(this.fontSize);
-        contentStream = this.getContentStream();
+        contentStream = this.getContentStream(false);
         graphicsStateKey = this.maybeEmbedGraphicsState({
           opacity: options.opacity,
           blendMode: options.blendMode,
@@ -256,10 +262,8 @@ export default class PDFDocumentBuilder {
 
   nextPage() {
     if (this.isLastPage) {
-      console.log("add a new page");
       this.addPage();
     } else {
-      console.log("switch to next page");
       this.switchToPage(this.pageIndex + 1);
     }
   }
