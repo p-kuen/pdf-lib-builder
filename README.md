@@ -31,6 +31,15 @@ builder.text("Hello world.");
 
 It automatically goes to the next line when writing a text. You can pass the default `pdf-lib`-options to the `text` function.
 
+### Create an image
+
+To create an image pass an already embedded image (either [embedJpg](https://pdf-lib.js.org/docs/api/classes/pdfdocument#embedjpg) or [embedPng](https://pdf-lib.js.org/docs/api/classes/pdfdocument#embedpng)).
+Additional to the [default options](https://pdf-lib.js.org/docs/api/#const-drawimage) you can pass a `fit` option, which automatically fits the image in the given box.
+
+```ts
+builder.image(image);
+```
+
 ### Moving
 
 ```ts
