@@ -160,7 +160,7 @@ export default class PDFDocumentBuilder {
         });
       }
 
-      this.page.moveDown(lineHeight);
+      this.page.moveDown(fontSize);
 
       const operators = drawText(line, {
         color,
