@@ -1,5 +1,6 @@
 import { createServer } from "http";
 import { PDFDocument, StandardFonts } from "pdf-lib";
+import fetch from "node-fetch";
 import PDFDocumentBuilder from "pdf-lib-builder";
 
 const port = 4000;
@@ -16,7 +17,7 @@ createServer(async (req, res) => {
 
   builder.text("There should be a space between last lines and this line.");
 
-  builder.moveDown(5);
+  builder.moveDown(4);
 
   builder.text("We skipped 5 lines now.");
 
@@ -24,7 +25,19 @@ createServer(async (req, res) => {
 
   builder.text("This text should be bold", { font: boldFont });
   builder.text("This should be big", { size: 48 });
-  builder.moveDown(6);
+
+  // jpg=ArrayBuffer
+  const url = "https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg";
+
+  const arrayBuffer = await fetch(url).then((res) => res.arrayBuffer());
+  const image = await doc.embedJpg(arrayBuffer);
+
+  builder.moveDown();
+
+  builder.image(image, { fit: { height: 100 } });
+
+  builder.moveDown();
+
   builder.text("This should show on next page with automatic wrapping");
 
   res.write(await doc.save());
