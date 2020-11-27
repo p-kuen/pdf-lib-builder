@@ -148,7 +148,7 @@ export default class PDFDocumentBuilder {
     });
 
     for (const line of encodedLines) {
-      if (this.y + lineHeight > this.maxY) {
+      if (this.y + fontSize > this.maxY) {
         this.nextPage();
 
         // Add font to directory on the new page and get the font key
