@@ -95,6 +95,7 @@ class PDFDocumentBuilder {
             blendMode: options.blendMode,
         });
         for (const line of encodedLines) {
+            // Check if current line is beneath maxY. If so, switch to next page
             if (this.y + fontSize > this.maxY) {
                 this.nextPage();
                 // Add font to directory on the new page and get the font key
@@ -163,7 +164,6 @@ class PDFDocumentBuilder {
         if (this.y + (options?.height || image.height) > this.maxY) {
             this.nextPage();
             this.moveTo(this.options.margins.left, this.options.margins.top);
-            this.setFontSize(this.fontSize);
         }
         // because the origin is on the bottom left, let's first move down by the image height
         this.page.moveDown(options?.height || image.height);
@@ -192,6 +192,8 @@ class PDFDocumentBuilder {
         this.contentStream = undefined;
         this.contentStreamRef = undefined;
         this.pageIndex++;
+        // add current font to dictionary
+        this.setFont(this.font);
     }
     nextPage() {
         if (this.isLastPage) {
