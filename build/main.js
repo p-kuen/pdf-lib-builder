@@ -62,7 +62,6 @@ class PDFDocumentBuilder {
     setFontSize(size) {
         this.fontSize = size;
         this.page.setFontSize(size);
-        this.setLineHeight(size * this.lineHeightFactor);
     }
     setLineHeight(lineHeight) {
         this.lineHeightFactor = lineHeight / this.fontSize;

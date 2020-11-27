@@ -102,7 +102,6 @@ export default class PDFDocumentBuilder {
   setFontSize(size: number) {
     this.fontSize = size;
     this.page.setFontSize(size);
-    this.setLineHeight(size * this.lineHeightFactor);
   }
 
   setLineHeight(lineHeight: number) {
