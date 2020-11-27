@@ -7,7 +7,7 @@ const port = 4000;
 
 createServer(async (req, res) => {
   const doc = await PDFDocument.create();
-  const builder = new PDFDocumentBuilder(doc);
+  const builder = new PDFDocumentBuilder(doc, { margins: { top: 32, right: 25, left: 70, bottom: 50 } });
 
   builder.text("This is a test document");
   builder.text("This should be rendered on next line.");
@@ -19,7 +19,7 @@ createServer(async (req, res) => {
 
   builder.moveDown(4);
 
-  builder.text("We skipped 5 lines now.");
+  builder.text("We skipped 4 lines now.");
 
   const boldFont = doc.embedStandardFont(StandardFonts.HelveticaBold);
 
@@ -32,15 +32,13 @@ createServer(async (req, res) => {
   const arrayBuffer = await fetch(url).then((res) => res.arrayBuffer());
   const image = await doc.embedJpg(arrayBuffer);
 
-  builder.moveDown();
-
   builder.image(image, { fit: { height: 100 } });
 
   builder.moveDown();
 
   builder.text("This should show on next page with automatic wrapping");
 
-  res.write(await doc.save());
+  res.write(await doc.save({ useObjectStreams: true }));
   res.end();
 }).listen(port);
 
