@@ -194,7 +194,19 @@ export default class PDFDocumentBuilder {
       image = input;
     } else {
       const fileContent = readFileSync(input);
-      image = await this.doc.embedJpg(fileContent);
+      const { fromBuffer } = await import("file-type");
+      const fileType = await fromBuffer(fileContent);
+
+      if (!fileType) {
+        console.error(`File type of file ${input} could not be determined, using JPEG!`);
+        image = await this.doc.embedJpg(fileContent);
+      } else if (fileType.mime === "image/jpeg") {
+        image = await this.doc.embedJpg(fileContent);
+      } else if (fileType.mime === "image/png") {
+        image = await this.doc.embedPng(fileContent);
+      } else {
+        throw new Error(`File type ${fileType.mime} could not be used as an image!`);
+      }
     }
 
     if (options?.fit) {
