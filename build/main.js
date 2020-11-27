@@ -25,8 +25,8 @@ class PDFDocumentBuilder {
     constructor(doc, options) {
         this.fontSize = 24;
         this.fontColor = pdf_lib_1.rgb(0, 0, 0);
+        /** The factor a line is larger than it's font size */
         this.lineHeightFactor = 1.3;
-        this.lineHeight = 24;
         this.pageIndex = 0;
         this.doc = doc;
         this.font = this.doc.embedStandardFont(pdf_lib_1.StandardFonts.Helvetica);
@@ -65,7 +65,7 @@ class PDFDocumentBuilder {
         this.setLineHeight(size * this.lineHeightFactor);
     }
     setLineHeight(lineHeight) {
-        this.lineHeight = lineHeight;
+        this.lineHeightFactor = lineHeight / this.fontSize;
         this.page.setLineHeight(lineHeight);
     }
     text(text, options) {
@@ -91,12 +91,11 @@ class PDFDocumentBuilder {
         const rotate = options.rotate || pdf_lib_1.degrees(0);
         const xSkew = options.xSkew || pdf_lib_1.degrees(0);
         const ySkew = options.ySkew || pdf_lib_1.degrees(0);
-        const lineHeight = options.lineHeight || this.lineHeight;
+        const lineHeight = options.lineHeight || fontSize * this.lineHeightFactor;
         let graphicsStateKey = this.maybeEmbedGraphicsState({
             opacity: options.opacity,
             blendMode: options.blendMode,
         });
-        let i = 0;
         for (const line of encodedLines) {
             if (this.y + lineHeight > this.maxY) {
                 this.nextPage();
@@ -124,8 +123,9 @@ class PDFDocumentBuilder {
                 y: options.y ? this.page.getHeight() - options.y : this.page.getY(),
                 graphicsState: graphicsStateKey,
             });
+            // Move down the difference of lineHeight and font size to create a gap **after** the text
+            this.page.moveDown(lineHeight - fontSize);
             contentStream.push(...operators);
-            i++;
         }
         if (options.font)
             this.setFont(originalFont);
@@ -206,6 +206,9 @@ class PDFDocumentBuilder {
     setFontColor(fontColor) {
         this.fontColor = fontColor;
         this.page.setFontColor(fontColor);
+    }
+    get lineHeight() {
+        return this.fontSize * this.lineHeightFactor;
     }
     get isLastPage() {
         return this.pageIndex === this.doc.getPageCount() - 1;

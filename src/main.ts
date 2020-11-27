@@ -5,7 +5,6 @@ import {
   cleanText,
   Color,
   degrees,
-  drawLinesOfText,
   drawText,
   lineSplit,
   PDFContentStream,
@@ -52,8 +51,9 @@ export default class PDFDocumentBuilder {
 
   fontSize = 24;
   fontColor: Color = rgb(0, 0, 0);
+
+  /** The factor a line is larger than it's font size */
   lineHeightFactor = 1.3;
-  lineHeight = 24;
 
   pageIndex = 0;
 
@@ -106,7 +106,7 @@ export default class PDFDocumentBuilder {
   }
 
   setLineHeight(lineHeight: number) {
-    this.lineHeight = lineHeight;
+    this.lineHeightFactor = lineHeight / this.fontSize;
     this.page.setLineHeight(lineHeight);
   }
 
@@ -140,14 +140,13 @@ export default class PDFDocumentBuilder {
     const rotate = options.rotate || degrees(0);
     const xSkew = options.xSkew || degrees(0);
     const ySkew = options.ySkew || degrees(0);
-    const lineHeight = options.lineHeight || this.lineHeight;
+    const lineHeight = options.lineHeight || fontSize * this.lineHeightFactor;
 
     let graphicsStateKey = this.maybeEmbedGraphicsState({
       opacity: options.opacity,
       blendMode: options.blendMode,
     });
 
-    let i = 0;
     for (const line of encodedLines) {
       if (this.y + lineHeight > this.maxY) {
         this.nextPage();
@@ -180,8 +179,10 @@ export default class PDFDocumentBuilder {
         graphicsState: graphicsStateKey,
       });
 
+      // Move down the difference of lineHeight and font size to create a gap **after** the text
+      this.page.moveDown(lineHeight - fontSize);
+
       contentStream.push(...operators);
-      i++;
     }
 
     if (options.font) this.setFont(originalFont);
@@ -272,6 +273,10 @@ export default class PDFDocumentBuilder {
   setFontColor(fontColor: Color) {
     this.fontColor = fontColor;
     this.page.setFontColor(fontColor);
+  }
+
+  get lineHeight() {
+    return this.fontSize * this.lineHeightFactor;
   }
 
   get isLastPage() {

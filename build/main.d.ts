@@ -22,8 +22,8 @@ export default class PDFDocumentBuilder {
     private fontKey?;
     fontSize: number;
     fontColor: Color;
+    /** The factor a line is larger than it's font size */
     lineHeightFactor: number;
-    lineHeight: number;
     pageIndex: number;
     contentStream?: PDFContentStream;
     contentStreamRef?: PDFRef;
@@ -41,6 +41,7 @@ export default class PDFDocumentBuilder {
     addPage(): void;
     nextPage(): void;
     setFontColor(fontColor: Color): void;
+    get lineHeight(): number;
     get isLastPage(): boolean;
     get x(): number;
     get y(): number;
