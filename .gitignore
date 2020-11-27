@@ -1,2 +1,2 @@
-build
+*.tsbuildinfo
 node_modules
