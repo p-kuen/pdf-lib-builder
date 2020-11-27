@@ -135,7 +135,6 @@ export default class PDFDocumentBuilder {
     let contentStream = this.getContentStream();
 
     const color = options.color || this.fontColor;
-    const size = options.size || fontSize;
     const rotate = options.rotate || degrees(0);
     const xSkew = options.xSkew || degrees(0);
     const ySkew = options.ySkew || degrees(0);
@@ -169,7 +168,7 @@ export default class PDFDocumentBuilder {
       const operators = drawText(line, {
         color,
         font: fontKey,
-        size,
+        size: fontSize,
         rotate,
         xSkew,
         ySkew,

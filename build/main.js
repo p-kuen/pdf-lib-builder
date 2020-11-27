@@ -86,7 +86,6 @@ class PDFDocumentBuilder {
         const encodedLines = textLines.map((text) => font.encodeText(text));
         let contentStream = this.getContentStream();
         const color = options.color || this.fontColor;
-        const size = options.size || fontSize;
         const rotate = options.rotate || pdf_lib_1.degrees(0);
         const xSkew = options.xSkew || pdf_lib_1.degrees(0);
         const ySkew = options.ySkew || pdf_lib_1.degrees(0);
@@ -114,7 +113,7 @@ class PDFDocumentBuilder {
             const operators = pdf_lib_1.drawText(line, {
                 color,
                 font: fontKey,
-                size,
+                size: fontSize,
                 rotate,
                 xSkew,
                 ySkew,
