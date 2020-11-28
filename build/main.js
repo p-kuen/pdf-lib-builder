@@ -96,7 +96,7 @@ class PDFDocumentBuilder {
         });
         for (const line of encodedLines) {
             // Check if current line is beneath maxY. If so, switch to next page
-            if (this.y + fontSize > this.maxY) {
+            if (options.y !== undefined && this.y + fontSize > this.maxY) {
                 this.nextPage();
                 // Add font to directory on the new page and get the font key
                 this.setFont(font);
