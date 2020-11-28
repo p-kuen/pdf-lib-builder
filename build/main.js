@@ -226,7 +226,7 @@ class PDFDocumentBuilder {
         this.page.moveTo(this.page.getX(), this.page.getHeight() - newY);
     }
     get maxY() {
-        return this.page.getHeight() - this.options.margins.top - this.options.margins.bottom;
+        return this.page.getHeight() - this.options.margins.bottom;
     }
     getContentStream(useExisting = true) {
         if (useExisting && this.contentStream)
