@@ -186,6 +186,8 @@ class PDFDocumentBuilder {
         this.contentStream = undefined;
         this.contentStreamRef = undefined;
         this.pageIndex = index;
+        // add current font to dictionary because the current fontKey is not valid on the new page
+        this.setFont(this.font);
     }
     addPage() {
         this.page = this.doc.addPage();
