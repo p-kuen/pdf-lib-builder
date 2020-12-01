@@ -94,7 +94,9 @@ class PDFDocumentBuilder {
             opacity: options.opacity,
             blendMode: options.blendMode,
         });
+        let i = 0;
         for (const line of encodedLines) {
+            const isLastLine = i === encodedLines.length - 1;
             // Check if current line is beneath maxY. If so, switch to next page
             if (options.y === undefined && this.y + fontSize > this.maxY) {
                 this.nextPage();
@@ -123,8 +125,17 @@ class PDFDocumentBuilder {
                 graphicsState: graphicsStateKey,
             });
             // Move down the difference of lineHeight and font size to create a gap **after** the text
-            this.page.moveDown(lineHeight - fontSize);
+            if (options.lineBreak !== false || !isLastLine) {
+                this.page.moveDown(lineHeight - fontSize);
+            }
+            else {
+                this.page.moveUp(fontSize);
+                if (!options.x) {
+                    this.x = this.page.getX() + font.widthOfTextAtSize(textLines[i], fontSize);
+                }
+            }
             contentStream.push(...operators);
+            i++;
         }
         if (options.font)
             this.setFont(originalFont);
@@ -168,6 +179,13 @@ class PDFDocumentBuilder {
         // because the origin is on the bottom left, let's first move down by the image height
         this.page.moveDown(options?.height || image.height);
         this.page.drawImage(image, options);
+    }
+    rect(options) {
+        if (options.y) {
+            options.y = this.page.getHeight() - options.y;
+        }
+        options.y = (options.y ?? this.page.getY()) - (options.height ?? 100);
+        this.page.drawRectangle(options);
     }
     moveTo(x, y) {
         this.page.moveTo(x, this.page.getHeight() - y);

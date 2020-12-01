@@ -28,6 +28,20 @@ http_1.createServer(async (req, res) => {
     builder.image(image, { fit: { height: 100 } });
     builder.moveDown();
     builder.text("This should show on next page with automatic wrapping");
+    builder.text("This should not break", { lineBreak: false });
+    builder.text("This should be placed right next to the previous line and should break");
+    builder.x = builder.options.margins.left;
+    builder.text("This should be placed on the next line");
+    builder.rect({
+        width: 200,
+        height: 100,
+    });
+    builder.rect({
+        width: 200,
+        height: 100,
+        x: builder.page.getWidth() - builder.options.margins.right - 200,
+        y: builder.y,
+    });
     res.write(await doc.save({ useObjectStreams: true }));
     res.end();
 }).listen(port);

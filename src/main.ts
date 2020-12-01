@@ -247,6 +247,16 @@ export default class PDFDocumentBuilder {
     this.page.drawImage(image, options);
   }
 
+  rect(options: PDFPageDrawRectangleOptions) {
+    if (options.y) {
+      options.y = this.page.getHeight() - options.y;
+    }
+
+    options.y = (options.y ?? this.page.getY()) - (options.height ?? 100);
+
+    this.page.drawRectangle(options);
+  }
+
   moveTo(x: number, y: number) {
     this.page.moveTo(x, this.page.getHeight() - y);
   }
