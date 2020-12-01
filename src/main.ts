@@ -15,6 +15,7 @@ import {
   PDFOperator,
   PDFPage,
   PDFPageDrawImageOptions,
+  PDFPageDrawRectangleOptions,
   PDFPageDrawTextOptions,
   PDFRef,
   rgb,
@@ -39,6 +40,10 @@ interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions {
     width?: number;
     height?: number;
   };
+}
+
+interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
+  lineBreak?: boolean;
 }
 
 export default class PDFDocumentBuilder {
@@ -109,8 +114,8 @@ export default class PDFDocumentBuilder {
     this.page.setLineHeight(lineHeight);
   }
 
-  text(text: string, options?: PDFPageDrawTextOptions) {
-    const defaultOptions: PDFPageDrawTextOptions = {
+  text(text: string, options?: PDFBuilderPageDrawTextOptions) {
+    const defaultOptions: PDFBuilderPageDrawTextOptions = {
       maxWidth: Infinity,
     };
     options = Object.assign(defaultOptions, options);
@@ -145,7 +150,9 @@ export default class PDFDocumentBuilder {
       blendMode: options.blendMode,
     });
 
+    let i = 0;
     for (const line of encodedLines) {
+      const isLastLine = i === encodedLines.length - 1;
       // Check if current line is beneath maxY. If so, switch to next page
       if (options.y === undefined && this.y + fontSize > this.maxY) {
         this.nextPage();
@@ -179,9 +186,18 @@ export default class PDFDocumentBuilder {
       });
 
       // Move down the difference of lineHeight and font size to create a gap **after** the text
-      this.page.moveDown(lineHeight - fontSize);
+      if (options.lineBreak !== false || !isLastLine) {
+        this.page.moveDown(lineHeight - fontSize);
+      } else {
+        this.page.moveUp(fontSize);
+
+        if (!options.x) {
+          this.x = this.page.getX() + font.widthOfTextAtSize(textLines[i], fontSize);
+        }
+      }
 
       contentStream.push(...operators);
+      i++;
     }
 
     if (options.font) this.setFont(originalFont);
