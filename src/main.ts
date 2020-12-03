@@ -314,9 +314,6 @@ export default class PDFDocumentBuilder {
   }
 
   line(options: PDFPageDrawLineOptions) {
-    options.start.y = this.convertY(options.start.y);
-    options.end.y = this.convertY(options.end.y);
-
     const graphicsStateKey = this.maybeEmbedGraphicsState({
       borderOpacity: options.opacity,
       blendMode: options.blendMode,
@@ -325,8 +322,14 @@ export default class PDFDocumentBuilder {
     const contentStream = this.getContentStream();
     contentStream.push(
       ...drawLine({
-        start: options.start,
-        end: options.end,
+        start: {
+          x: options.start.x,
+          y: this.convertY(options.start.y),
+        },
+        end: {
+          x: options.end.x,
+          y: this.convertY(options.end.y),
+        },
         thickness: options.thickness ?? 1,
         color: options.color ?? rgb(0, 0, 0),
         dashArray: options.dashArray ?? undefined,

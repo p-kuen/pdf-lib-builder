@@ -51,15 +51,26 @@ createServer(async (req, res) => {
     height: 100,
   });
 
+  const start = {
+    x: builder.options.margins.left,
+    y: builder.y + 100,
+  };
+
+  const end = {
+    x: builder.options.margins.left + 200,
+    y: builder.y,
+  };
+
   builder.line({
-    start: {
-      x: builder.options.margins.left,
-      y: builder.y + 100,
-    },
-    end: {
-      x: builder.options.margins.left + 200,
-      y: builder.y,
-    },
+    start,
+    end,
+    color: rgb(1, 0, 0),
+    thickness: 2,
+  });
+
+  builder.line({
+    start,
+    end,
     color: rgb(1, 1, 1),
   });
 

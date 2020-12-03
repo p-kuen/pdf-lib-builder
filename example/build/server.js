@@ -37,15 +37,23 @@ http_1.createServer(async (req, res) => {
         width: 200,
         height: 100,
     });
+    const start = {
+        x: builder.options.margins.left,
+        y: builder.y + 100,
+    };
+    const end = {
+        x: builder.options.margins.left + 200,
+        y: builder.y,
+    };
     builder.line({
-        start: {
-            x: builder.options.margins.left,
-            y: builder.y + 100,
-        },
-        end: {
-            x: builder.options.margins.left + 200,
-            y: builder.y,
-        },
+        start,
+        end,
+        color: pdf_lib_1.rgb(1, 0, 0),
+        thickness: 2,
+    });
+    builder.line({
+        start,
+        end,
         color: pdf_lib_1.rgb(1, 1, 1),
     });
     const [font] = builder.getFont();
