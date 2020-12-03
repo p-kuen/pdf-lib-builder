@@ -123,6 +123,13 @@ export default class PDFDocumentBuilder {
       options.maxWidth || Infinity,
       this.page.getWidth() - this.x - this.options.margins.right
     );
+
+    // handle position options
+    let originalY = this.y;
+    if (options.y) {
+      this.y = options.y;
+    }
+
     const [originalFont] = this.getFont();
     if (options.font) this.setFont(options.font);
     let [font, fontKey] = this.getFont();
@@ -181,7 +188,7 @@ export default class PDFDocumentBuilder {
         xSkew,
         ySkew,
         x: options.x || this.page.getX(),
-        y: options.y ? this.page.getHeight() - options.y : this.page.getY(),
+        y: this.page.getY(),
         graphicsState: graphicsStateKey,
       });
 
@@ -198,6 +205,10 @@ export default class PDFDocumentBuilder {
 
       contentStream.push(...operators);
       i++;
+    }
+
+    if (options.y) {
+      this.y = originalY;
     }
 
     if (options.font) this.setFont(originalFont);
