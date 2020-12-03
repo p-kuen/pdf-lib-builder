@@ -25,6 +25,7 @@ http_1.createServer(async (req, res) => {
     const url = "https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg";
     const arrayBuffer = await node_fetch_1.default(url).then((res) => res.arrayBuffer());
     const image = await doc.embedJpg(arrayBuffer);
+    builder.image(image, { x: 10, y: 10, fit: { height: 100 }, opacity: 0.2 });
     builder.image(image, { fit: { height: 100 } });
     builder.moveDown();
     builder.text("This should show on next page with automatic wrapping");

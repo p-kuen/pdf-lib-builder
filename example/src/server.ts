@@ -32,6 +32,8 @@ createServer(async (req, res) => {
   const arrayBuffer = await fetch(url).then((res) => res.arrayBuffer());
   const image = await doc.embedJpg(arrayBuffer);
 
+  builder.image(image, { x: 10, y: 10, fit: { height: 100 }, opacity: 0.2 });
+
   builder.image(image, { fit: { height: 100 } });
 
   builder.moveDown();

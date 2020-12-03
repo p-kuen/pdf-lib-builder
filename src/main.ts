@@ -252,9 +252,6 @@ export default class PDFDocumentBuilder {
       this.moveTo(this.options.margins.left, this.options.margins.top);
     }
 
-    // because the origin is on the bottom left, let's first move down by the image height
-    this.page.moveDown(options?.height || image.height);
-
     const xObjectKey = addRandomSuffix("Image", 10);
     this.page.node.setXObject(PDFName.of(xObjectKey), image.ref);
 
@@ -276,6 +273,11 @@ export default class PDFDocumentBuilder {
         graphicsState: graphicsStateKey,
       })
     );
+
+    // if the image is in the text flow, move down to set position after the image
+    if (options?.y === undefined) {
+      this.page.moveDown(options?.height || image.height);
+    }
   }
 
   rect(options: PDFPageDrawRectangleOptions) {
