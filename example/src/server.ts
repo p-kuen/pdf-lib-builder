@@ -110,6 +110,8 @@ createServer(async (req, res) => {
     align: TextAlignment.Right,
   });
 
+  builder.ellipse({ xScale: 10, yScale: 10 });
+
   res.write(await doc.save({ useObjectStreams: true }));
   res.end();
 }).listen(port);

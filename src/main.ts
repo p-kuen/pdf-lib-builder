@@ -5,6 +5,7 @@ import {
   cleanText,
   Color,
   degrees,
+  drawEllipse,
   drawImage,
   drawLine,
   drawRectangle,
@@ -17,6 +18,7 @@ import {
   PDFName,
   PDFOperator,
   PDFPage,
+  PDFPageDrawEllipseOptions,
   PDFPageDrawImageOptions,
   PDFPageDrawLineOptions,
   PDFPageDrawRectangleOptions,
@@ -322,6 +324,32 @@ export default class PDFDocumentBuilder {
         borderDashPhase: options.borderDashPhase ?? undefined,
         graphicsState: graphicsStateKey,
         borderLineCap: options.borderLineCap ?? undefined,
+      })
+    );
+  }
+
+  ellipse(options?: PDFPageDrawEllipseOptions) {
+    const graphicsStateKey = this.maybeEmbedGraphicsState({
+      opacity: options?.opacity,
+      borderOpacity: options?.borderOpacity,
+      blendMode: options?.blendMode,
+    });
+
+    const contentStream = this.getContentStream();
+    contentStream.push(
+      ...drawEllipse({
+        x: options?.x ?? this.x,
+        y: this.convertY(options?.y ?? this.y),
+        xScale: options?.xScale ?? 100,
+        yScale: options?.yScale ?? 100,
+        rotate: options?.rotate ?? undefined,
+        color: options?.color ?? (options?.borderColor ? undefined : rgb(0, 0, 0)),
+        borderColor: options?.borderColor ?? undefined,
+        borderWidth: options?.borderWidth ?? 0,
+        borderDashArray: options?.borderDashArray ?? undefined,
+        borderDashPhase: options?.borderDashPhase ?? undefined,
+        borderLineCap: options?.borderLineCap ?? undefined,
+        graphicsState: graphicsStateKey,
       })
     );
   }

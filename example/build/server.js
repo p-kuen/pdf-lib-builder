@@ -86,6 +86,7 @@ http_1.createServer(async (req, res) => {
         x: builder.page.getWidth() - builder.options.margins.right,
         align: pdf_lib_1.TextAlignment.Right,
     });
+    builder.ellipse({ xScale: 10, yScale: 10 });
     res.write(await doc.save({ useObjectStreams: true }));
     res.end();
 }).listen(port);

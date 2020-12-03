@@ -240,6 +240,28 @@ class PDFDocumentBuilder {
             borderLineCap: options.borderLineCap ?? undefined,
         }));
     }
+    ellipse(options) {
+        const graphicsStateKey = this.maybeEmbedGraphicsState({
+            opacity: options?.opacity,
+            borderOpacity: options?.borderOpacity,
+            blendMode: options?.blendMode,
+        });
+        const contentStream = this.getContentStream();
+        contentStream.push(...pdf_lib_1.drawEllipse({
+            x: options?.x ?? this.x,
+            y: this.convertY(options?.y ?? this.y),
+            xScale: options?.xScale ?? 100,
+            yScale: options?.yScale ?? 100,
+            rotate: options?.rotate ?? undefined,
+            color: options?.color ?? (options?.borderColor ? undefined : pdf_lib_1.rgb(0, 0, 0)),
+            borderColor: options?.borderColor ?? undefined,
+            borderWidth: options?.borderWidth ?? 0,
+            borderDashArray: options?.borderDashArray ?? undefined,
+            borderDashPhase: options?.borderDashPhase ?? undefined,
+            borderLineCap: options?.borderLineCap ?? undefined,
+            graphicsState: graphicsStateKey,
+        }));
+    }
     line(options) {
         const graphicsStateKey = this.maybeEmbedGraphicsState({
             borderOpacity: options.opacity,
