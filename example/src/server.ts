@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { degrees, PDFDocument, radians, rgb, StandardFonts } from "pdf-lib";
 import fetch from "node-fetch";
 import PDFDocumentBuilder from "pdf-lib-builder";
 
@@ -47,6 +47,28 @@ createServer(async (req, res) => {
   builder.rect({
     width: 200,
     height: 100,
+  });
+
+  builder.line({
+    start: {
+      x: builder.options.margins.left,
+      y: builder.y + 100,
+    },
+    end: {
+      x: builder.options.margins.left + 200,
+      y: builder.y,
+    },
+    color: rgb(1, 1, 1),
+  });
+
+  const [font] = builder.getFont();
+  const text = "I am on the line";
+  builder.text(text, {
+    x: builder.options.margins.left + 100 - font.widthOfTextAtSize(text, 8) / 2,
+    y: builder.y + 50,
+    color: rgb(1, 1, 1),
+    size: 8,
+    rotate: radians(Math.atan2(100, 200)),
   });
 
   builder.rect({

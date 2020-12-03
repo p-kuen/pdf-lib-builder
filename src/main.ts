@@ -5,6 +5,8 @@ import {
   cleanText,
   Color,
   degrees,
+  drawImage,
+  drawLine,
   drawRectangle,
   drawText,
   lineSplit,
@@ -16,6 +18,7 @@ import {
   PDFOperator,
   PDFPage,
   PDFPageDrawImageOptions,
+  PDFPageDrawLineOptions,
   PDFPageDrawRectangleOptions,
   PDFPageDrawTextOptions,
   PDFRef,
@@ -243,10 +246,6 @@ export default class PDFDocumentBuilder {
       options.height = fitDims.height;
     }
 
-    if (options?.y) {
-      options.y = this.page.getHeight() - options.y - (options.height || image.height);
-    }
-
     // at this point, let's check if there is enough space for the lines on this page
     if (this.y + (options?.height || image.height) > this.maxY) {
       this.nextPage();
@@ -256,16 +255,30 @@ export default class PDFDocumentBuilder {
     // because the origin is on the bottom left, let's first move down by the image height
     this.page.moveDown(options?.height || image.height);
 
-    this.page.drawImage(image, options);
+    const xObjectKey = addRandomSuffix("Image", 10);
+    this.page.node.setXObject(PDFName.of(xObjectKey), image.ref);
+
+    const graphicsStateKey = this.maybeEmbedGraphicsState({
+      opacity: options?.opacity,
+      blendMode: options?.blendMode,
+    });
+
+    const contentStream = this.getContentStream();
+    contentStream.push(
+      ...drawImage(xObjectKey, {
+        x: options?.x ?? this.x,
+        y: this.convertY(options?.y ?? this.y) - (options?.height || image.height),
+        width: options?.width ?? image.size().width,
+        height: options?.height ?? image.size().height,
+        rotate: options?.rotate ?? degrees(0),
+        xSkew: options?.xSkew ?? degrees(0),
+        ySkew: options?.ySkew ?? degrees(0),
+        graphicsState: graphicsStateKey,
+      })
+    );
   }
 
   rect(options: PDFPageDrawRectangleOptions) {
-    if (options.y) {
-      options.y = this.page.getHeight() - options.y;
-    }
-
-    options.y = (options.y ?? this.page.getY()) - (options.height ?? 100);
-
     const contentStream = this.getContentStream();
 
     const graphicsStateKey = this.maybeEmbedGraphicsState({
@@ -281,7 +294,7 @@ export default class PDFDocumentBuilder {
     contentStream.push(
       ...drawRectangle({
         x: options.x ?? this.x,
-        y: options.y ?? this.y,
+        y: this.convertY(options.y ?? this.y) - (options.height ?? 100),
         width: options.width ?? 150,
         height: options.height ?? 100,
         rotate: options.rotate ?? degrees(0),
@@ -298,8 +311,32 @@ export default class PDFDocumentBuilder {
     );
   }
 
+  line(options: PDFPageDrawLineOptions) {
+    options.start.y = this.convertY(options.start.y);
+    options.end.y = this.convertY(options.end.y);
+
+    const graphicsStateKey = this.maybeEmbedGraphicsState({
+      borderOpacity: options.opacity,
+      blendMode: options.blendMode,
+    });
+
+    const contentStream = this.getContentStream();
+    contentStream.push(
+      ...drawLine({
+        start: options.start,
+        end: options.end,
+        thickness: options.thickness ?? 1,
+        color: options.color ?? rgb(0, 0, 0),
+        dashArray: options.dashArray ?? undefined,
+        dashPhase: options.dashPhase ?? undefined,
+        lineCap: options.lineCap ?? undefined,
+        graphicsState: graphicsStateKey,
+      })
+    );
+  }
+
   moveTo(x: number, y: number) {
-    this.page.moveTo(x, this.page.getHeight() - y);
+    this.page.moveTo(x, this.convertY(y));
   }
 
   hexColor(hex: string) {
@@ -346,6 +383,10 @@ export default class PDFDocumentBuilder {
     this.page.setFontColor(fontColor);
   }
 
+  private convertY(y: number) {
+    return this.page.getHeight() - y;
+  }
+
   get lineHeight() {
     return this.fontSize * this.lineHeightFactor;
   }
@@ -359,7 +400,7 @@ export default class PDFDocumentBuilder {
   }
 
   get y() {
-    return this.page.getHeight() - this.page.getY();
+    return this.convertY(this.page.getY());
   }
 
   set x(newX: number) {

@@ -36,6 +36,26 @@ http_1.createServer(async (req, res) => {
         width: 200,
         height: 100,
     });
+    builder.line({
+        start: {
+            x: builder.options.margins.left,
+            y: builder.y + 100,
+        },
+        end: {
+            x: builder.options.margins.left + 200,
+            y: builder.y,
+        },
+        color: pdf_lib_1.rgb(1, 1, 1),
+    });
+    const [font] = builder.getFont();
+    const text = "I am on the line";
+    builder.text(text, {
+        x: builder.options.margins.left + 100 - font.widthOfTextAtSize(text, 8) / 2,
+        y: builder.y + 50,
+        color: pdf_lib_1.rgb(1, 1, 1),
+        size: 8,
+        rotate: pdf_lib_1.radians(Math.atan2(100, 200)),
+    });
     builder.rect({
         width: 200,
         height: 100,

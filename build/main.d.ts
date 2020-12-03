@@ -1,4 +1,4 @@
-import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawImageOptions, PDFPageDrawRectangleOptions, PDFPageDrawTextOptions, PDFRef } from "pdf-lib";
+import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawTextOptions, PDFRef } from "pdf-lib";
 interface Margins {
     top: number;
     bottom: number;
@@ -39,12 +39,14 @@ export default class PDFDocumentBuilder {
     text(text: string, options?: PDFBuilderPageDrawTextOptions): void;
     image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<void>;
     rect(options: PDFPageDrawRectangleOptions): void;
+    line(options: PDFPageDrawLineOptions): void;
     moveTo(x: number, y: number): void;
     hexColor(hex: string): import("pdf-lib").RGB;
     switchToPage(index: number): void;
     addPage(): void;
     nextPage(): void;
     setFontColor(fontColor: Color): void;
+    private convertY;
     get lineHeight(): number;
     get isLastPage(): boolean;
     get x(): number;
