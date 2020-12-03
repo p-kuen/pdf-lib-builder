@@ -77,6 +77,15 @@ http_1.createServer(async (req, res) => {
         y: builder.y,
         color: pdf_lib_1.rgb(0.8, 0.8, 0.8),
     });
+    builder.moveDown(5);
+    builder.text("This text should be aligned in the center", {
+        x: builder.page.getWidth() / 2,
+        align: pdf_lib_1.TextAlignment.Center,
+    });
+    builder.text("This text should be aligned at the right", {
+        x: builder.page.getWidth() - builder.options.margins.right,
+        align: pdf_lib_1.TextAlignment.Right,
+    });
     res.write(await doc.save({ useObjectStreams: true }));
     res.end();
 }).listen(port);

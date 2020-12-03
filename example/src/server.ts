@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import { degrees, PDFDocument, radians, rgb, StandardFonts } from "pdf-lib";
+import { degrees, PDFDocument, radians, rgb, StandardFonts, TextAlignment } from "pdf-lib";
 import fetch from "node-fetch";
 import PDFDocumentBuilder from "pdf-lib-builder";
 
@@ -96,6 +96,18 @@ createServer(async (req, res) => {
     x: builder.page.getWidth() - builder.options.margins.right - 200,
     y: builder.y,
     color: rgb(0.8, 0.8, 0.8),
+  });
+
+  builder.moveDown(5);
+
+  builder.text("This text should be aligned in the center", {
+    x: builder.page.getWidth() / 2,
+    align: TextAlignment.Center,
+  });
+
+  builder.text("This text should be aligned at the right", {
+    x: builder.page.getWidth() - builder.options.margins.right,
+    align: TextAlignment.Right,
   });
 
   res.write(await doc.save({ useObjectStreams: true }));

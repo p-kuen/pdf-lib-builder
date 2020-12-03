@@ -24,6 +24,7 @@ import {
   PDFRef,
   rgb,
   StandardFonts,
+  TextAlignment,
 } from "pdf-lib";
 
 import { readFileSync } from "fs";
@@ -48,6 +49,7 @@ interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions {
 
 interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
   lineBreak?: boolean;
+  align?: TextAlignment;
 }
 
 export default class PDFDocumentBuilder {
@@ -182,6 +184,17 @@ export default class PDFDocumentBuilder {
         });
       }
 
+      let x = options.x || this.page.getX();
+
+      // Handle alignment
+      if (options.align) {
+        if (options.align === TextAlignment.Center) {
+          x -= textWidth(textLines[i]) / 2;
+        } else if (options.align === TextAlignment.Right) {
+          x -= textWidth(textLines[i]);
+        }
+      }
+
       this.page.moveDown(fontSize);
 
       const operators = drawText(line, {
@@ -191,7 +204,7 @@ export default class PDFDocumentBuilder {
         rotate,
         xSkew,
         ySkew,
-        x: options.x || this.page.getX(),
+        x,
         y: this.page.getY(),
         graphicsState: graphicsStateKey,
       });
@@ -203,7 +216,7 @@ export default class PDFDocumentBuilder {
         this.page.moveUp(fontSize);
 
         if (!options.x) {
-          this.x = this.page.getX() + font.widthOfTextAtSize(textLines[i], fontSize);
+          this.x = this.page.getX() + textWidth(textLines[i]);
         }
       }
 

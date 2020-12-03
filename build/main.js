@@ -117,6 +117,16 @@ class PDFDocumentBuilder {
                     blendMode: options.blendMode,
                 });
             }
+            let x = options.x || this.page.getX();
+            // Handle alignment
+            if (options.align) {
+                if (options.align === pdf_lib_1.TextAlignment.Center) {
+                    x -= textWidth(textLines[i]) / 2;
+                }
+                else if (options.align === pdf_lib_1.TextAlignment.Right) {
+                    x -= textWidth(textLines[i]);
+                }
+            }
             this.page.moveDown(fontSize);
             const operators = pdf_lib_1.drawText(line, {
                 color,
@@ -125,7 +135,7 @@ class PDFDocumentBuilder {
                 rotate,
                 xSkew,
                 ySkew,
-                x: options.x || this.page.getX(),
+                x,
                 y: this.page.getY(),
                 graphicsState: graphicsStateKey,
             });
@@ -136,7 +146,7 @@ class PDFDocumentBuilder {
             else {
                 this.page.moveUp(fontSize);
                 if (!options.x) {
-                    this.x = this.page.getX() + font.widthOfTextAtSize(textLines[i], fontSize);
+                    this.x = this.page.getX() + textWidth(textLines[i]);
                 }
             }
             contentStream.push(...operators);

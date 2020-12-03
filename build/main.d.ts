@@ -1,4 +1,4 @@
-import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawTextOptions, PDFRef } from "pdf-lib";
+import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment } from "pdf-lib";
 interface Margins {
     top: number;
     bottom: number;
@@ -16,6 +16,7 @@ interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions {
 }
 interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
     lineBreak?: boolean;
+    align?: TextAlignment;
 }
 export default class PDFDocumentBuilder {
     doc: PDFDocument;
