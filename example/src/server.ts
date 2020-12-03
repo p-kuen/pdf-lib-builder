@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import fetch from "node-fetch";
 import PDFDocumentBuilder from "pdf-lib-builder";
 
@@ -54,6 +54,13 @@ createServer(async (req, res) => {
     height: 100,
     x: builder.page.getWidth() - builder.options.margins.right - 200,
     y: builder.y,
+  });
+
+  builder.text("This text should be wrapped inside rect", {
+    maxWidth: 200,
+    x: builder.page.getWidth() - builder.options.margins.right - 200,
+    y: builder.y,
+    color: rgb(0.8, 0.8, 0.8),
   });
 
   res.write(await doc.save({ useObjectStreams: true }));

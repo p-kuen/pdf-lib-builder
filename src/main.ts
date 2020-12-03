@@ -5,6 +5,7 @@ import {
   cleanText,
   Color,
   degrees,
+  drawRectangle,
   drawText,
   lineSplit,
   PDFContentStream,
@@ -265,7 +266,36 @@ export default class PDFDocumentBuilder {
 
     options.y = (options.y ?? this.page.getY()) - (options.height ?? 100);
 
-    this.page.drawRectangle(options);
+    const contentStream = this.getContentStream();
+
+    const graphicsStateKey = this.maybeEmbedGraphicsState({
+      opacity: options.opacity,
+      borderOpacity: options.borderOpacity,
+      blendMode: options.blendMode,
+    });
+
+    if (!options.color && !options.borderColor) {
+      options.color = rgb(0, 0, 0);
+    }
+
+    contentStream.push(
+      ...drawRectangle({
+        x: options.x ?? this.x,
+        y: options.y ?? this.y,
+        width: options.width ?? 150,
+        height: options.height ?? 100,
+        rotate: options.rotate ?? degrees(0),
+        xSkew: options.xSkew ?? degrees(0),
+        ySkew: options.ySkew ?? degrees(0),
+        borderWidth: options.borderWidth ?? 0,
+        color: options.color ?? undefined,
+        borderColor: options.borderColor ?? undefined,
+        borderDashArray: options.borderDashArray ?? undefined,
+        borderDashPhase: options.borderDashPhase ?? undefined,
+        graphicsState: graphicsStateKey,
+        borderLineCap: options.borderLineCap ?? undefined,
+      })
+    );
   }
 
   moveTo(x: number, y: number) {

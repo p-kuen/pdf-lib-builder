@@ -73,6 +73,11 @@ class PDFDocumentBuilder {
         };
         options = Object.assign(defaultOptions, options);
         options.maxWidth = Math.min(options.maxWidth || Infinity, this.page.getWidth() - this.x - this.options.margins.right);
+        // handle position options
+        let originalY = this.y;
+        if (options.y) {
+            this.y = options.y;
+        }
         const [originalFont] = this.getFont();
         if (options.font)
             this.setFont(options.font);
@@ -121,7 +126,7 @@ class PDFDocumentBuilder {
                 xSkew,
                 ySkew,
                 x: options.x || this.page.getX(),
-                y: options.y ? this.page.getHeight() - options.y : this.page.getY(),
+                y: this.page.getY(),
                 graphicsState: graphicsStateKey,
             });
             // Move down the difference of lineHeight and font size to create a gap **after** the text
@@ -136,6 +141,9 @@ class PDFDocumentBuilder {
             }
             contentStream.push(...operators);
             i++;
+        }
+        if (options.y) {
+            this.y = originalY;
         }
         if (options.font)
             this.setFont(originalFont);
@@ -185,7 +193,31 @@ class PDFDocumentBuilder {
             options.y = this.page.getHeight() - options.y;
         }
         options.y = (options.y ?? this.page.getY()) - (options.height ?? 100);
-        this.page.drawRectangle(options);
+        const contentStream = this.getContentStream();
+        const graphicsStateKey = this.maybeEmbedGraphicsState({
+            opacity: options.opacity,
+            borderOpacity: options.borderOpacity,
+            blendMode: options.blendMode,
+        });
+        if (!options.color && !options.borderColor) {
+            options.color = pdf_lib_1.rgb(0, 0, 0);
+        }
+        contentStream.push(...pdf_lib_1.drawRectangle({
+            x: options.x ?? this.x,
+            y: options.y ?? this.y,
+            width: options.width ?? 150,
+            height: options.height ?? 100,
+            rotate: options.rotate ?? pdf_lib_1.degrees(0),
+            xSkew: options.xSkew ?? pdf_lib_1.degrees(0),
+            ySkew: options.ySkew ?? pdf_lib_1.degrees(0),
+            borderWidth: options.borderWidth ?? 0,
+            color: options.color ?? undefined,
+            borderColor: options.borderColor ?? undefined,
+            borderDashArray: options.borderDashArray ?? undefined,
+            borderDashPhase: options.borderDashPhase ?? undefined,
+            graphicsState: graphicsStateKey,
+            borderLineCap: options.borderLineCap ?? undefined,
+        }));
     }
     moveTo(x, y) {
         this.page.moveTo(x, this.page.getHeight() - y);

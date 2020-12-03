@@ -42,6 +42,12 @@ http_1.createServer(async (req, res) => {
         x: builder.page.getWidth() - builder.options.margins.right - 200,
         y: builder.y,
     });
+    builder.text("This text should be wrapped inside rect", {
+        maxWidth: 200,
+        x: builder.page.getWidth() - builder.options.margins.right - 200,
+        y: builder.y,
+        color: pdf_lib_1.rgb(0.8, 0.8, 0.8),
+    });
     res.write(await doc.save({ useObjectStreams: true }));
     res.end();
 }).listen(port);
