@@ -52,6 +52,7 @@ interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions {
 interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
   lineBreak?: boolean;
   align?: TextAlignment;
+  maxLines?: number
 }
 
 export default class PDFDocumentBuilder {
@@ -150,7 +151,26 @@ export default class PDFDocumentBuilder {
         ? lineSplit(cleanText(text))
         : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
 
-    const encodedLines = textLines.map((text) => font.encodeText(text));
+
+    const encodedLines = []
+
+    let i = 0
+    for (const text of textLines) {
+      // check if maxLines are exceeded
+      if (i === (options?.maxLines || Infinity)) {
+        break
+      }
+
+      // if this is a cut off line add an ellipsis
+      if (i === ((options?.maxLines || Infinity) - 1) && textLines.length > i + 1) {
+        const ellipsis = '…'
+        encodedLines.push(font.encodeText(breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis))
+      } else {
+        encodedLines.push(font.encodeText(text))
+      }
+
+      i++
+    }
 
     let contentStream = this.getContentStream();
 
@@ -165,7 +185,7 @@ export default class PDFDocumentBuilder {
       blendMode: options.blendMode,
     });
 
-    let i = 0;
+    i = 0;
     for (const line of encodedLines) {
       const isLastLine = i === encodedLines.length - 1;
       // Check if current line is beneath maxY. If so, switch to next page

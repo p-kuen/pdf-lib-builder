@@ -86,7 +86,11 @@ http_1.createServer(async (req, res) => {
         x: builder.page.getWidth() - builder.options.margins.right,
         align: pdf_lib_1.TextAlignment.Right,
     });
+    builder.moveDown(1);
     builder.ellipse({ xScale: 10, yScale: 10 });
+    builder.moveDown(1);
+    builder.rect({ x: builder.x - 3, y: builder.y, width: builder.page.getWidth() / 2 - builder.options.margins.left + 6, height: font.heightAtSize(builder.fontSize) + 6, opacity: 0.3 });
+    builder.text("This text is cut off at half of the page because there maxLines is set to 1", { maxWidth: builder.page.getWidth() / 2 - builder.options.margins.left, maxLines: 1 });
     res.write(await doc.save({ useObjectStreams: true }));
     res.end();
 }).listen(port);

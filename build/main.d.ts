@@ -17,6 +17,7 @@ interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions {
 interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
     lineBreak?: boolean;
     align?: TextAlignment;
+    maxLines?: number;
 }
 export default class PDFDocumentBuilder {
     doc: PDFDocument;
