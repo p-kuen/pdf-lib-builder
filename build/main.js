@@ -305,6 +305,31 @@ class PDFDocumentBuilder {
             graphicsState: graphicsStateKey,
         }));
     }
+    svgPath(path, options) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        const graphicsStateKey = this.maybeEmbedGraphicsState({
+            opacity: options.opacity,
+            borderOpacity: options.borderOpacity,
+            blendMode: options.blendMode,
+        });
+        if (!options.color && !options.borderColor) {
+            options.borderColor = pdf_lib_1.rgb(0, 0, 0);
+        }
+        const contentStream = this.getContentStream();
+        contentStream.push(...pdf_lib_1.drawSvgPath(path, {
+            x: (_a = options.x) !== null && _a !== void 0 ? _a : this.x,
+            y: this.convertY((_b = options.y) !== null && _b !== void 0 ? _b : this.y),
+            scale: options.scale,
+            rotate: (_c = options.rotate) !== null && _c !== void 0 ? _c : pdf_lib_1.degrees(0),
+            color: (_d = options.color) !== null && _d !== void 0 ? _d : undefined,
+            borderColor: (_e = options.borderColor) !== null && _e !== void 0 ? _e : undefined,
+            borderWidth: (_f = options.borderWidth) !== null && _f !== void 0 ? _f : 0,
+            borderDashArray: (_g = options.borderDashArray) !== null && _g !== void 0 ? _g : undefined,
+            borderDashPhase: (_h = options.borderDashPhase) !== null && _h !== void 0 ? _h : undefined,
+            borderLineCap: (_j = options.borderLineCap) !== null && _j !== void 0 ? _j : undefined,
+            graphicsState: graphicsStateKey,
+        }));
+    }
     moveTo(x, y) {
         this.page.moveTo(x, this.convertY(y));
     }

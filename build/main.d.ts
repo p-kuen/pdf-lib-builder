@@ -1,4 +1,4 @@
-import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment } from "pdf-lib";
+import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment } from "pdf-lib";
 interface Margins {
     top: number;
     bottom: number;
@@ -43,6 +43,7 @@ export default class PDFDocumentBuilder {
     rect(options: PDFPageDrawRectangleOptions): void;
     ellipse(options?: PDFPageDrawEllipseOptions): void;
     line(options: PDFPageDrawLineOptions): void;
+    svgPath(path: string, options: PDFPageDrawSVGOptions): void;
     moveTo(x: number, y: number): void;
     hexColor(hex: string): import("pdf-lib").RGB;
     switchToPage(index: number): void;

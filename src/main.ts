@@ -9,6 +9,7 @@ import {
   drawImage,
   drawLine,
   drawRectangle,
+  drawSvgPath,
   drawText,
   lineSplit,
   PDFContentStream,
@@ -22,6 +23,7 @@ import {
   PDFPageDrawImageOptions,
   PDFPageDrawLineOptions,
   PDFPageDrawRectangleOptions,
+  PDFPageDrawSVGOptions,
   PDFPageDrawTextOptions,
   PDFRef,
   rgb,
@@ -398,6 +400,35 @@ export default class PDFDocumentBuilder {
         lineCap: options.lineCap ?? undefined,
         graphicsState: graphicsStateKey,
       })
+    );
+  }
+
+  svgPath(path: string, options: PDFPageDrawSVGOptions) {
+    const graphicsStateKey = this.maybeEmbedGraphicsState({
+      opacity: options.opacity,
+      borderOpacity: options.borderOpacity,
+      blendMode: options.blendMode,
+    });
+
+    if (!options.color && !options.borderColor) {
+      options.borderColor = rgb(0, 0, 0)
+    }
+
+    const contentStream = this.getContentStream();
+    contentStream.push(
+      ...drawSvgPath(path, {
+        x: options.x ?? this.x,
+        y: this.convertY(options.y ?? this.y),
+        scale: options.scale,
+        rotate: options.rotate ?? degrees(0),
+        color: options.color ?? undefined,
+        borderColor: options.borderColor ?? undefined,
+        borderWidth: options.borderWidth ?? 0,
+        borderDashArray: options.borderDashArray ?? undefined,
+        borderDashPhase: options.borderDashPhase ?? undefined,
+        borderLineCap: options.borderLineCap ?? undefined,
+        graphicsState: graphicsStateKey,
+      }),
     );
   }
 

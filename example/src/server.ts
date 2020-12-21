@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import { degrees, PDFDocument, radians, rgb, StandardFonts, TextAlignment } from "pdf-lib";
+import { PDFDocument, radians, rgb, StandardFonts, TextAlignment } from "pdf-lib";
 import fetch from "node-fetch";
 import PDFDocumentBuilder from "pdf-lib-builder";
 
@@ -118,6 +118,8 @@ createServer(async (req, res) => {
 
   builder.rect({ x: builder.x - 3, y: builder.y, width: builder.page.getWidth() / 2 - builder.options.margins.left + 6, height: font.heightAtSize(builder.fontSize) + 6, opacity: 0.3 })
   builder.text("This text is cut off at half of the page because there maxLines is set to 1", { maxWidth: builder.page.getWidth() / 2 - builder.options.margins.left, maxLines: 1 })
+
+  builder.svgPath('M 10,10 L 10,20 L 20,10 L 10,10', {x: 10, y: 10})
 
   res.write(await doc.save({ useObjectStreams: true }));
   res.end();
