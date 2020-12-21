@@ -49,6 +49,7 @@ createServer(async (req, res) => {
   builder.rect({
     width: 200,
     height: 100,
+    color: builder.hexColor('#ff203040')
   });
 
   const start = {
