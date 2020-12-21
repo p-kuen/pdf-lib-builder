@@ -335,7 +335,6 @@ class PDFDocumentBuilder {
     }
     hexColor(hex) {
         const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        console.log(result);
         return result
             ? pdf_lib_1.rgb(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
             : pdf_lib_1.rgb(0, 0, 0);
