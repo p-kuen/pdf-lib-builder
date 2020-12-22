@@ -54,7 +54,7 @@ interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions {
 interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
   lineBreak?: boolean;
   align?: TextAlignment;
-  maxLines?: number
+  maxLines?: number;
 }
 
 export default class PDFDocumentBuilder {
@@ -153,25 +153,36 @@ export default class PDFDocumentBuilder {
         ? lineSplit(cleanText(text))
         : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
 
+    const encodedLines = [];
 
-    const encodedLines = []
-
-    let i = 0
+    let i = 0;
     for (const text of textLines) {
       // check if maxLines are exceeded
       if (i === (options?.maxLines || Infinity)) {
-        break
+        break;
       }
 
       // if this is a cut off line add an ellipsis
-      if (i === ((options?.maxLines || Infinity) - 1) && textLines.length > i + 1) {
-        const ellipsis = '…'
-        encodedLines.push(font.encodeText(breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis))
+      if (
+        i === (options?.maxLines || Infinity) - 1 &&
+        textLines.length > i + 1
+      ) {
+        const ellipsis = "…";
+        encodedLines.push(
+          font.encodeText(
+            breakTextIntoLines(
+              text,
+              wordBreaks,
+              options.maxWidth - textWidth(ellipsis),
+              textWidth
+            )[0] + ellipsis
+          )
+        );
       } else {
-        encodedLines.push(font.encodeText(text))
+        encodedLines.push(font.encodeText(text));
       }
 
-      i++
+      i++;
     }
 
     let contentStream = this.getContentStream();
@@ -255,7 +266,10 @@ export default class PDFDocumentBuilder {
     if (options.font) this.setFont(originalFont);
   }
 
-  async image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions) {
+  async image(
+    input: string | PDFImage,
+    options?: PDFBuilderPageDrawImageOptions
+  ) {
     let image: PDFImage;
 
     if (typeof input !== "string") {
@@ -266,19 +280,26 @@ export default class PDFDocumentBuilder {
       const fileType = await fromBuffer(fileContent);
 
       if (!fileType) {
-        console.error(`File type of file ${input} could not be determined, using JPEG!`);
+        console.error(
+          `File type of file ${input} could not be determined, using JPEG!`
+        );
         image = await this.doc.embedJpg(fileContent);
       } else if (fileType.mime === "image/jpeg") {
         image = await this.doc.embedJpg(fileContent);
       } else if (fileType.mime === "image/png") {
         image = await this.doc.embedPng(fileContent);
       } else {
-        throw new Error(`File type ${fileType.mime} could not be used as an image!`);
+        throw new Error(
+          `File type ${fileType.mime} could not be used as an image!`
+        );
       }
     }
 
     if (options?.fit) {
-      const fitDims = image.scaleToFit(options.fit.width || image.width, options.fit.height || image.height);
+      const fitDims = image.scaleToFit(
+        options.fit.width || image.width,
+        options.fit.height || image.height
+      );
       options.width = fitDims.width;
       options.height = fitDims.height;
     }
@@ -301,7 +322,9 @@ export default class PDFDocumentBuilder {
     contentStream.push(
       ...drawImage(xObjectKey, {
         x: options?.x ?? this.x,
-        y: this.convertY(options?.y ?? this.y) - (options?.height || image.height),
+        y:
+          this.convertY(options?.y ?? this.y) -
+          (options?.height || image.height),
         width: options?.width ?? image.size().width,
         height: options?.height ?? image.size().height,
         rotate: options?.rotate ?? degrees(0),
@@ -365,7 +388,8 @@ export default class PDFDocumentBuilder {
         xScale: options?.xScale ?? 100,
         yScale: options?.yScale ?? 100,
         rotate: options?.rotate ?? undefined,
-        color: options?.color ?? (options?.borderColor ? undefined : rgb(0, 0, 0)),
+        color:
+          options?.color ?? (options?.borderColor ? undefined : rgb(0, 0, 0)),
         borderColor: options?.borderColor ?? undefined,
         borderWidth: options?.borderWidth ?? 0,
         borderDashArray: options?.borderDashArray ?? undefined,
@@ -411,7 +435,7 @@ export default class PDFDocumentBuilder {
     });
 
     if (!options.color && !options.borderColor) {
-      options.borderColor = rgb(0, 0, 0)
+      options.borderColor = rgb(0, 0, 0);
     }
 
     const contentStream = this.getContentStream();
@@ -428,7 +452,7 @@ export default class PDFDocumentBuilder {
         borderDashPhase: options.borderDashPhase ?? undefined,
         borderLineCap: options.borderLineCap ?? undefined,
         graphicsState: graphicsStateKey,
-      }),
+      })
     );
   }
 
@@ -539,7 +563,11 @@ export default class PDFDocumentBuilder {
   }): string | undefined {
     const { opacity, borderOpacity, blendMode } = options;
 
-    if (opacity === undefined && borderOpacity === undefined && blendMode === undefined) {
+    if (
+      opacity === undefined &&
+      borderOpacity === undefined &&
+      blendMode === undefined
+    ) {
       return undefined;
     }
 

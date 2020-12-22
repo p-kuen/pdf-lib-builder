@@ -96,8 +96,9 @@ class PDFDocumentBuilder {
                 break;
             }
             // if this is a cut off line add an ellipsis
-            if (i === (((options === null || options === void 0 ? void 0 : options.maxLines) || Infinity) - 1) && textLines.length > i + 1) {
-                const ellipsis = '…';
+            if (i === ((options === null || options === void 0 ? void 0 : options.maxLines) || Infinity) - 1 &&
+                textLines.length > i + 1) {
+                const ellipsis = "…";
                 encodedLines.push(font.encodeText(pdf_lib_1.breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
             }
             else {
@@ -217,7 +218,8 @@ class PDFDocumentBuilder {
         const contentStream = this.getContentStream();
         contentStream.push(...pdf_lib_1.drawImage(xObjectKey, {
             x: (_a = options === null || options === void 0 ? void 0 : options.x) !== null && _a !== void 0 ? _a : this.x,
-            y: this.convertY((_b = options === null || options === void 0 ? void 0 : options.y) !== null && _b !== void 0 ? _b : this.y) - ((options === null || options === void 0 ? void 0 : options.height) || image.height),
+            y: this.convertY((_b = options === null || options === void 0 ? void 0 : options.y) !== null && _b !== void 0 ? _b : this.y) -
+                ((options === null || options === void 0 ? void 0 : options.height) || image.height),
             width: (_c = options === null || options === void 0 ? void 0 : options.width) !== null && _c !== void 0 ? _c : image.size().width,
             height: (_d = options === null || options === void 0 ? void 0 : options.height) !== null && _d !== void 0 ? _d : image.size().height,
             rotate: (_e = options === null || options === void 0 ? void 0 : options.rotate) !== null && _e !== void 0 ? _e : pdf_lib_1.degrees(0),
@@ -334,9 +336,9 @@ class PDFDocumentBuilder {
         this.page.moveTo(x, this.convertY(y));
     }
     hexColor(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+        const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
-            ? pdf_lib_1.rgb(parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255)
+            ? pdf_lib_1.rgb(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
             : pdf_lib_1.rgb(0, 0, 0);
     }
     switchToPage(index) {
@@ -409,7 +411,9 @@ class PDFDocumentBuilder {
     }
     maybeEmbedGraphicsState(options) {
         const { opacity, borderOpacity, blendMode } = options;
-        if (opacity === undefined && borderOpacity === undefined && blendMode === undefined) {
+        if (opacity === undefined &&
+            borderOpacity === undefined &&
+            blendMode === undefined) {
             return undefined;
         }
         const key = pdf_lib_1.addRandomSuffix("GS", 10);
