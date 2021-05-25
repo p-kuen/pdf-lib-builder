@@ -5,38 +5,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = require("http");
 const pdf_lib_1 = require("pdf-lib");
-const node_fetch_1 = __importDefault(require("node-fetch"));
+const gibma_1 = require("gibma");
 const pdf_lib_builder_1 = __importDefault(require("pdf-lib-builder"));
 const port = 4000;
 http_1.createServer(async (req, res) => {
     const doc = await pdf_lib_1.PDFDocument.create();
     const builder = new pdf_lib_builder_1.default(doc, { margins: { top: 32, right: 25, left: 70, bottom: 50 } });
-    builder.text("This is a test document");
-    builder.text("This should be rendered on next line.");
-    builder.text("On this text \nwe \nfind \nnew \nlines");
+    builder.text('This is a test document');
+    builder.text('This should be rendered on next line.');
+    builder.text('On this text \nwe \nfind \nnew \nlines');
     builder.moveDown(1);
-    builder.text("There should be a space between last lines and this line.");
+    builder.text('There should be a space between last lines and this line.');
     builder.moveDown(4);
-    builder.text("We skipped 4 lines now.");
+    builder.text('We skipped 4 lines now.');
     const boldFont = doc.embedStandardFont(pdf_lib_1.StandardFonts.HelveticaBold);
-    builder.text("This text should be bold", { font: boldFont });
-    builder.text("This should be big", { size: 48 });
+    builder.text('This text should be bold', { font: boldFont });
+    builder.text('This should be big', { size: 48 });
     // jpg=ArrayBuffer
-    const url = "https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg";
-    const arrayBuffer = await node_fetch_1.default(url).then((res) => res.arrayBuffer());
-    const image = await doc.embedJpg(arrayBuffer);
+    const url = 'https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg';
+    const string = await gibma_1.request(url).then((res) => res.data);
+    const image = await doc.embedJpg(Buffer.from(string));
     builder.image(image, { x: 10, y: 10, fit: { height: 100 }, opacity: 0.2 });
     builder.image(image, { fit: { height: 100 } });
     builder.moveDown();
-    builder.text("This should show on next page with automatic wrapping");
-    builder.text("This should not break", { lineBreak: false });
-    builder.text("This should be placed right next to the previous line and should break");
+    builder.text('This should show on next page with automatic wrapping');
+    builder.text('This should not break', { lineBreak: false });
+    builder.text('This should be placed right next to the previous line and should break');
     builder.x = builder.options.margins.left;
-    builder.text("This should be placed on the next line");
+    builder.text('This should be placed on the next line');
     builder.rect({
         width: 200,
         height: 100,
-        color: builder.hexColor('#ff203040')
+        color: builder.hexColor('#ff203040'),
     });
     const start = {
         x: builder.options.margins.left,
@@ -58,7 +58,7 @@ http_1.createServer(async (req, res) => {
         color: pdf_lib_1.rgb(1, 1, 1),
     });
     const [font] = builder.getFont();
-    const text = "I am on the line";
+    const text = 'I am on the line';
     builder.text(text, {
         x: builder.options.margins.left + 100 - font.widthOfTextAtSize(text, 8) / 2,
         y: builder.y + 50,
@@ -72,26 +72,35 @@ http_1.createServer(async (req, res) => {
         x: builder.page.getWidth() - builder.options.margins.right - 200,
         y: builder.y,
     });
-    builder.text("This text should be wrapped inside rect", {
+    builder.text('This text should be wrapped inside rect', {
         maxWidth: 200,
         x: builder.page.getWidth() - builder.options.margins.right - 200,
         y: builder.y,
         color: pdf_lib_1.rgb(0.8, 0.8, 0.8),
     });
     builder.moveDown(5);
-    builder.text("This text should be aligned in the center", {
+    builder.text('This text should be aligned in the center', {
         x: builder.page.getWidth() / 2,
         align: pdf_lib_1.TextAlignment.Center,
     });
-    builder.text("This text should be aligned at the right", {
+    builder.text('This text should be aligned at the right', {
         x: builder.page.getWidth() - builder.options.margins.right,
         align: pdf_lib_1.TextAlignment.Right,
     });
     builder.moveDown(1);
     builder.ellipse({ xScale: 10, yScale: 10 });
     builder.moveDown(1);
-    builder.rect({ x: builder.x - 3, y: builder.y, width: builder.page.getWidth() / 2 - builder.options.margins.left + 6, height: font.heightAtSize(builder.fontSize) + 6, opacity: 0.3 });
-    builder.text("This text is cut off at half of the page because there maxLines is set to 1", { maxWidth: builder.page.getWidth() / 2 - builder.options.margins.left, maxLines: 1 });
+    builder.rect({
+        x: builder.x - 3,
+        y: builder.y,
+        width: builder.page.getWidth() / 2 - builder.options.margins.left + 6,
+        height: font.heightAtSize(builder.fontSize) + 6,
+        opacity: 0.3,
+    });
+    builder.text('This text is cut off at half of the page because there maxLines is set to 1', {
+        maxWidth: builder.page.getWidth() / 2 - builder.options.margins.left,
+        maxLines: 1,
+    });
     builder.svgPath('M 10,10 L 10,20 L 20,10 L 10,10', { x: 10, y: 10 });
     res.write(await doc.save({ useObjectStreams: true }));
     res.end();
