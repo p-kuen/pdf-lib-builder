@@ -40,18 +40,18 @@ interface Margins {
   right: number
 }
 
-interface PDFDocumentBuilderOptions {
+export interface PDFDocumentBuilderOptions {
   margins: Margins
 }
 
-interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions {
+export interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions {
   fit?: {
     width?: number
     height?: number
   }
 }
 
-interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
+export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
   lineBreak?: boolean
   align?: TextAlignment
   maxLines?: number

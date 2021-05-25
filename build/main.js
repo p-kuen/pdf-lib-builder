@@ -96,9 +96,8 @@ class PDFDocumentBuilder {
                 break;
             }
             // if this is a cut off line add an ellipsis
-            if (i === ((options === null || options === void 0 ? void 0 : options.maxLines) || Infinity) - 1 &&
-                textLines.length > i + 1) {
-                const ellipsis = "…";
+            if (i === ((options === null || options === void 0 ? void 0 : options.maxLines) || Infinity) - 1 && textLines.length > i + 1) {
+                const ellipsis = '…';
                 encodedLines.push(font.encodeText(pdf_lib_1.breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
             }
             else {
@@ -178,21 +177,21 @@ class PDFDocumentBuilder {
     async image(input, options) {
         var _a, _b, _c, _d, _e, _f, _g;
         let image;
-        if (typeof input !== "string") {
+        if (typeof input !== 'string') {
             image = input;
         }
         else {
             const fileContent = fs_1.readFileSync(input);
-            const { fromBuffer } = await Promise.resolve().then(() => __importStar(require("file-type")));
+            const { fromBuffer } = await Promise.resolve().then(() => __importStar(require('file-type')));
             const fileType = await fromBuffer(fileContent);
             if (!fileType) {
                 console.error(`File type of file ${input} could not be determined, using JPEG!`);
                 image = await this.doc.embedJpg(fileContent);
             }
-            else if (fileType.mime === "image/jpeg") {
+            else if (fileType.mime === 'image/jpeg') {
                 image = await this.doc.embedJpg(fileContent);
             }
-            else if (fileType.mime === "image/png") {
+            else if (fileType.mime === 'image/png') {
                 image = await this.doc.embedPng(fileContent);
             }
             else {
@@ -209,7 +208,7 @@ class PDFDocumentBuilder {
             this.nextPage();
             this.moveTo(this.options.margins.left, this.options.margins.top);
         }
-        const xObjectKey = pdf_lib_1.addRandomSuffix("Image", 10);
+        const xObjectKey = pdf_lib_1.addRandomSuffix('Image', 10);
         this.page.node.setXObject(pdf_lib_1.PDFName.of(xObjectKey), image.ref);
         const graphicsStateKey = this.maybeEmbedGraphicsState({
             opacity: options === null || options === void 0 ? void 0 : options.opacity,
@@ -218,8 +217,7 @@ class PDFDocumentBuilder {
         const contentStream = this.getContentStream();
         contentStream.push(...pdf_lib_1.drawImage(xObjectKey, {
             x: (_a = options === null || options === void 0 ? void 0 : options.x) !== null && _a !== void 0 ? _a : this.x,
-            y: this.convertY((_b = options === null || options === void 0 ? void 0 : options.y) !== null && _b !== void 0 ? _b : this.y) -
-                ((options === null || options === void 0 ? void 0 : options.height) || image.height),
+            y: this.convertY((_b = options === null || options === void 0 ? void 0 : options.y) !== null && _b !== void 0 ? _b : this.y) - ((options === null || options === void 0 ? void 0 : options.height) || image.height),
             width: (_c = options === null || options === void 0 ? void 0 : options.width) !== null && _c !== void 0 ? _c : image.size().width,
             height: (_d = options === null || options === void 0 ? void 0 : options.height) !== null && _d !== void 0 ? _d : image.size().height,
             rotate: (_e = options === null || options === void 0 ? void 0 : options.rotate) !== null && _e !== void 0 ? _e : pdf_lib_1.degrees(0),
@@ -411,14 +409,12 @@ class PDFDocumentBuilder {
     }
     maybeEmbedGraphicsState(options) {
         const { opacity, borderOpacity, blendMode } = options;
-        if (opacity === undefined &&
-            borderOpacity === undefined &&
-            blendMode === undefined) {
+        if (opacity === undefined && borderOpacity === undefined && blendMode === undefined) {
             return undefined;
         }
-        const key = pdf_lib_1.addRandomSuffix("GS", 10);
+        const key = pdf_lib_1.addRandomSuffix('GS', 10);
         const graphicsState = this.doc.context.obj({
-            Type: "ExtGState",
+            Type: 'ExtGState',
             ca: opacity,
             CA: borderOpacity,
             BM: blendMode,
