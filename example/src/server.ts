@@ -1,7 +1,4 @@
-import { createServer } from 'http'
-import { PDFDocument, radians, rgb, StandardFonts, TextAlignment } from 'pdf-lib'
-import { request } from 'gibma'
-import PDFDocumentBuilder from 'pdf-lib-builder'
+import {PDFDocumentBuilder} from 'pdf-lib-builder'
 
 const port = 4000
 

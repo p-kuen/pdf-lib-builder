@@ -19,7 +19,7 @@ export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
     align?: TextAlignment;
     maxLines?: number;
 }
-export default class PDFDocumentBuilder {
+export declare class PDFDocumentBuilder {
     doc: PDFDocument;
     page: PDFPage;
     options: PDFDocumentBuilderOptions;
@@ -62,4 +62,4 @@ export default class PDFDocumentBuilder {
     private createContentStream;
     private maybeEmbedGraphicsState;
 }
-export {};
+export default PDFDocumentBuilder;

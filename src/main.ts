@@ -57,7 +57,7 @@ export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
   maxLines?: number
 }
 
-export default class PDFDocumentBuilder {
+export class PDFDocumentBuilder {
   doc: PDFDocument
   page: PDFPage
   options: PDFDocumentBuilderOptions
@@ -554,3 +554,5 @@ export default class PDFDocumentBuilder {
     return key
   }
 }
+
+export default PDFDocumentBuilder

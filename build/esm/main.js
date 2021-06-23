@@ -1,6 +1,6 @@
 import { addRandomSuffix, breakTextIntoLines, cleanText, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, lineSplit, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, } from 'pdf-lib';
 import { readFileSync } from 'fs';
-export default class PDFDocumentBuilder {
+export class PDFDocumentBuilder {
     constructor(doc, options) {
         this.fontSize = 24;
         this.fontColor = rgb(0, 0, 0);
@@ -397,4 +397,5 @@ export default class PDFDocumentBuilder {
         return key;
     }
 }
+export default PDFDocumentBuilder;
 //# sourceMappingURL=main.js.map

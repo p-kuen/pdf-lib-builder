@@ -19,6 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PDFDocumentBuilder = void 0;
 const pdf_lib_1 = require("pdf-lib");
 const fs_1 = require("fs");
 class PDFDocumentBuilder {
@@ -418,5 +419,6 @@ class PDFDocumentBuilder {
         return key;
     }
 }
+exports.PDFDocumentBuilder = PDFDocumentBuilder;
 exports.default = PDFDocumentBuilder;
 //# sourceMappingURL=main.js.map
