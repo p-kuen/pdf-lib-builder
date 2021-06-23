@@ -1,18 +1,18 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@types/node': ^15.6.1
-  file-type: ^16.4.0
+  '@types/node': ^15.12.4
+  file-type: ^16.5.0
   pdf-lib: ^1.16.0
-  typescript: ^4.2.4
+  typescript: ^4.3.4
 
 dependencies:
-  file-type: 16.4.0
+  file-type: 16.5.0
   pdf-lib: 1.16.0
 
 devDependencies:
-  '@types/node': 15.6.1
-  typescript: 4.2.4
+  '@types/node': 15.12.4
+  typescript: 4.3.4
 
 packages:
 
@@ -36,24 +36,23 @@ packages:
     resolution: {integrity: sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ==}
     dev: false
 
-  /@types/node/15.6.1:
-    resolution: {integrity: sha512-7EIraBEyRHEe7CH+Fm1XvgqU6uwZN8Q7jppJGcqjROMT29qhAuuOxYB1uEY5UMYQKEmA5D+5tBnhdaPXSsLONA==}
+  /@types/node/15.12.4:
+    resolution: {integrity: sha512-zrNj1+yqYF4WskCMOHwN+w9iuD12+dGm0rQ35HLl9/Ouuq52cEtd0CH9qMgrdNmi5ejC1/V7vKEXYubB+65DkA==}
 
   /@types/readable-stream/2.3.10:
     resolution: {integrity: sha512-xwSXvAv9x4B9Vj88AMZnFyEVLilz1EBxKvRUhGqIF4nJpRQBSTm7jS236X4Y9Y2qPsVvaMxwrGJlNhLHEahlFQ==}
     dependencies:
-      '@types/node': 15.6.1
+      '@types/node': 15.12.4
       safe-buffer: 5.2.1
     dev: false
 
-  /file-type/16.4.0:
-    resolution: {integrity: sha512-MDAkwha3wHg11Lp++2T3Gu347eC/DB4r7nYj6iZaf1l7UhGBh2746QKxg0BWC8w2dJsxUEmH8KvLueX+GthN2w==}
+  /file-type/16.5.0:
+    resolution: {integrity: sha512-OxgWA9tbL8N/WP00GD1z8O0MiwQKFyWRs1q+3FhjdvcGgKqwxcejyGWso3n4/IMU6DdwV+ARZ4A7TTnPkDcSiw==}
     engines: {node: '>=8'}
     dependencies:
       readable-web-to-node-stream: 3.0.1
       strtok3: 6.0.8
       token-types: 2.1.1
-      typedarray-to-buffer: 3.1.5
     dev: false
 
   /ieee754/1.2.1:
@@ -62,10 +61,6 @@ packages:
 
   /inherits/2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
-    dev: false
-
-  /is-typedarray/1.0.0:
-    resolution: {integrity: sha1-5HnICFjfDBsR3dppQPlgEfzaSpo=}
     dev: false
 
   /pako/1.0.11:
@@ -134,14 +129,8 @@ packages:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: false
 
-  /typedarray-to-buffer/3.1.5:
-    resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
-    dependencies:
-      is-typedarray: 1.0.0
-    dev: false
-
-  /typescript/4.2.4:
-    resolution: {integrity: sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==}
+  /typescript/4.3.4:
+    resolution: {integrity: sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
