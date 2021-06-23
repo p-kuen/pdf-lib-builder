@@ -8,13 +8,10 @@
     "moduleResolution": "node",
     "noImplicitAny": true,
     "declaration": true,
-    "typeRoots": ["./node_modules/@types", "./typings"],
     "esModuleInterop": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": false,
     "outDir": "./build",
-    "incremental": true
+    "incremental": true,
   },
-  "include": ["./src/", "./typings"],
-  "exclude": ["node_modules", ".logs", "upload"]
+  "include": ["./src"]
 }
