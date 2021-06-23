@@ -1,35 +1,14 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const pdf_lib_1 = require("pdf-lib");
-const fs_1 = require("fs");
-class PDFDocumentBuilder {
+import { addRandomSuffix, breakTextIntoLines, cleanText, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, lineSplit, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, } from 'pdf-lib';
+import { readFileSync } from 'fs';
+export default class PDFDocumentBuilder {
     constructor(doc, options) {
         this.fontSize = 24;
-        this.fontColor = pdf_lib_1.rgb(0, 0, 0);
+        this.fontColor = rgb(0, 0, 0);
         /** The factor a line is larger than it's font size */
         this.lineHeightFactor = 1.3;
         this.pageIndex = 0;
         this.doc = doc;
-        this.font = this.doc.embedStandardFont(pdf_lib_1.StandardFonts.Helvetica);
+        this.font = this.doc.embedStandardFont(StandardFonts.Helvetica);
         // If there is no page in the document, create one
         const pageCount = doc.getPageCount();
         if (pageCount === 0) {
@@ -49,12 +28,12 @@ class PDFDocumentBuilder {
     }
     setFont(font) {
         this.font = font;
-        this.fontKey = pdf_lib_1.addRandomSuffix(this.font.name);
-        this.page.node.setFontDictionary(pdf_lib_1.PDFName.of(this.fontKey), this.font.ref);
+        this.fontKey = addRandomSuffix(this.font.name);
+        this.page.node.setFontDictionary(PDFName.of(this.fontKey), this.font.ref);
     }
     getFont() {
         if (!this.font || !this.fontKey) {
-            const font = this.doc.embedStandardFont(pdf_lib_1.StandardFonts.Helvetica);
+            const font = this.doc.embedStandardFont(StandardFonts.Helvetica);
             this.setFont(font);
         }
         return [this.font, this.fontKey];
@@ -86,19 +65,19 @@ class PDFDocumentBuilder {
         const fontSize = options.size || this.fontSize;
         const textWidth = (t) => font.widthOfTextAtSize(t, fontSize);
         const textLines = options.maxWidth === undefined
-            ? pdf_lib_1.lineSplit(pdf_lib_1.cleanText(text))
-            : pdf_lib_1.breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
+            ? lineSplit(cleanText(text))
+            : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
         const encodedLines = [];
         let i = 0;
         for (const text of textLines) {
             // check if maxLines are exceeded
-            if (i === ((options === null || options === void 0 ? void 0 : options.maxLines) || Infinity)) {
+            if (i === (options?.maxLines || Infinity)) {
                 break;
             }
             // if this is a cut off line add an ellipsis
-            if (i === ((options === null || options === void 0 ? void 0 : options.maxLines) || Infinity) - 1 && textLines.length > i + 1) {
+            if (i === (options?.maxLines || Infinity) - 1 && textLines.length > i + 1) {
                 const ellipsis = '…';
-                encodedLines.push(font.encodeText(pdf_lib_1.breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
+                encodedLines.push(font.encodeText(breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
             }
             else {
                 encodedLines.push(font.encodeText(text));
@@ -107,9 +86,9 @@ class PDFDocumentBuilder {
         }
         let contentStream = this.getContentStream();
         const color = options.color || this.fontColor;
-        const rotate = options.rotate || pdf_lib_1.degrees(0);
-        const xSkew = options.xSkew || pdf_lib_1.degrees(0);
-        const ySkew = options.ySkew || pdf_lib_1.degrees(0);
+        const rotate = options.rotate || degrees(0);
+        const xSkew = options.xSkew || degrees(0);
+        const ySkew = options.ySkew || degrees(0);
         const lineHeight = options.lineHeight || fontSize * this.lineHeightFactor;
         let graphicsStateKey = this.maybeEmbedGraphicsState({
             opacity: options.opacity,
@@ -136,15 +115,15 @@ class PDFDocumentBuilder {
             let x = options.x || this.page.getX();
             // Handle alignment
             if (options.align) {
-                if (options.align === pdf_lib_1.TextAlignment.Center) {
+                if (options.align === TextAlignment.Center) {
                     x -= textWidth(textLines[i]) / 2;
                 }
-                else if (options.align === pdf_lib_1.TextAlignment.Right) {
+                else if (options.align === TextAlignment.Right) {
                     x -= textWidth(textLines[i]);
                 }
             }
             this.page.moveDown(fontSize);
-            const operators = pdf_lib_1.drawText(line, {
+            const operators = drawText(line, {
                 color,
                 font: fontKey,
                 size: fontSize,
@@ -175,14 +154,13 @@ class PDFDocumentBuilder {
             this.setFont(originalFont);
     }
     async image(input, options) {
-        var _a, _b, _c, _d, _e, _f, _g;
         let image;
         if (typeof input !== 'string') {
             image = input;
         }
         else {
-            const fileContent = fs_1.readFileSync(input);
-            const { fromBuffer } = await Promise.resolve().then(() => __importStar(require('file-type')));
+            const fileContent = readFileSync(input);
+            const { fromBuffer } = await import('file-type');
             const fileType = await fromBuffer(fileContent);
             if (!fileType) {
                 console.error(`File type of file ${input} could not be determined, using JPEG!`);
@@ -198,40 +176,39 @@ class PDFDocumentBuilder {
                 throw new Error(`File type ${fileType.mime} could not be used as an image!`);
             }
         }
-        if (options === null || options === void 0 ? void 0 : options.fit) {
+        if (options?.fit) {
             const fitDims = image.scaleToFit(options.fit.width || image.width, options.fit.height || image.height);
             options.width = fitDims.width;
             options.height = fitDims.height;
         }
         // at this point, let's check if there is enough space for the lines on this page
-        if (this.y + ((options === null || options === void 0 ? void 0 : options.height) || image.height) > this.maxY) {
+        if (this.y + (options?.height || image.height) > this.maxY) {
             this.nextPage();
             this.moveTo(this.options.margins.left, this.options.margins.top);
         }
-        const xObjectKey = pdf_lib_1.addRandomSuffix('Image', 10);
-        this.page.node.setXObject(pdf_lib_1.PDFName.of(xObjectKey), image.ref);
+        const xObjectKey = addRandomSuffix('Image', 10);
+        this.page.node.setXObject(PDFName.of(xObjectKey), image.ref);
         const graphicsStateKey = this.maybeEmbedGraphicsState({
-            opacity: options === null || options === void 0 ? void 0 : options.opacity,
-            blendMode: options === null || options === void 0 ? void 0 : options.blendMode,
+            opacity: options?.opacity,
+            blendMode: options?.blendMode,
         });
         const contentStream = this.getContentStream();
-        contentStream.push(...pdf_lib_1.drawImage(xObjectKey, {
-            x: (_a = options === null || options === void 0 ? void 0 : options.x) !== null && _a !== void 0 ? _a : this.x,
-            y: this.convertY((_b = options === null || options === void 0 ? void 0 : options.y) !== null && _b !== void 0 ? _b : this.y) - ((options === null || options === void 0 ? void 0 : options.height) || image.height),
-            width: (_c = options === null || options === void 0 ? void 0 : options.width) !== null && _c !== void 0 ? _c : image.size().width,
-            height: (_d = options === null || options === void 0 ? void 0 : options.height) !== null && _d !== void 0 ? _d : image.size().height,
-            rotate: (_e = options === null || options === void 0 ? void 0 : options.rotate) !== null && _e !== void 0 ? _e : pdf_lib_1.degrees(0),
-            xSkew: (_f = options === null || options === void 0 ? void 0 : options.xSkew) !== null && _f !== void 0 ? _f : pdf_lib_1.degrees(0),
-            ySkew: (_g = options === null || options === void 0 ? void 0 : options.ySkew) !== null && _g !== void 0 ? _g : pdf_lib_1.degrees(0),
+        contentStream.push(...drawImage(xObjectKey, {
+            x: options?.x ?? this.x,
+            y: this.convertY(options?.y ?? this.y) - (options?.height || image.height),
+            width: options?.width ?? image.size().width,
+            height: options?.height ?? image.size().height,
+            rotate: options?.rotate ?? degrees(0),
+            xSkew: options?.xSkew ?? degrees(0),
+            ySkew: options?.ySkew ?? degrees(0),
             graphicsState: graphicsStateKey,
         }));
         // if the image is in the text flow, move down to set position after the image
-        if ((options === null || options === void 0 ? void 0 : options.y) === undefined) {
-            this.page.moveDown((options === null || options === void 0 ? void 0 : options.height) || image.height);
+        if (options?.y === undefined) {
+            this.page.moveDown(options?.height || image.height);
         }
     }
     rect(options) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
         const contentStream = this.getContentStream();
         const graphicsStateKey = this.maybeEmbedGraphicsState({
             opacity: options.opacity,
@@ -239,56 +216,54 @@ class PDFDocumentBuilder {
             blendMode: options.blendMode,
         });
         if (!options.color && !options.borderColor) {
-            options.color = pdf_lib_1.rgb(0, 0, 0);
+            options.color = rgb(0, 0, 0);
         }
-        contentStream.push(...pdf_lib_1.drawRectangle({
-            x: (_a = options.x) !== null && _a !== void 0 ? _a : this.x,
-            y: this.convertY((_b = options.y) !== null && _b !== void 0 ? _b : this.y) - ((_c = options.height) !== null && _c !== void 0 ? _c : 100),
-            width: (_d = options.width) !== null && _d !== void 0 ? _d : 150,
-            height: (_e = options.height) !== null && _e !== void 0 ? _e : 100,
-            rotate: (_f = options.rotate) !== null && _f !== void 0 ? _f : pdf_lib_1.degrees(0),
-            xSkew: (_g = options.xSkew) !== null && _g !== void 0 ? _g : pdf_lib_1.degrees(0),
-            ySkew: (_h = options.ySkew) !== null && _h !== void 0 ? _h : pdf_lib_1.degrees(0),
-            borderWidth: (_j = options.borderWidth) !== null && _j !== void 0 ? _j : 0,
-            color: (_k = options.color) !== null && _k !== void 0 ? _k : undefined,
-            borderColor: (_l = options.borderColor) !== null && _l !== void 0 ? _l : undefined,
-            borderDashArray: (_m = options.borderDashArray) !== null && _m !== void 0 ? _m : undefined,
-            borderDashPhase: (_o = options.borderDashPhase) !== null && _o !== void 0 ? _o : undefined,
+        contentStream.push(...drawRectangle({
+            x: options.x ?? this.x,
+            y: this.convertY(options.y ?? this.y) - (options.height ?? 100),
+            width: options.width ?? 150,
+            height: options.height ?? 100,
+            rotate: options.rotate ?? degrees(0),
+            xSkew: options.xSkew ?? degrees(0),
+            ySkew: options.ySkew ?? degrees(0),
+            borderWidth: options.borderWidth ?? 0,
+            color: options.color ?? undefined,
+            borderColor: options.borderColor ?? undefined,
+            borderDashArray: options.borderDashArray ?? undefined,
+            borderDashPhase: options.borderDashPhase ?? undefined,
             graphicsState: graphicsStateKey,
-            borderLineCap: (_p = options.borderLineCap) !== null && _p !== void 0 ? _p : undefined,
+            borderLineCap: options.borderLineCap ?? undefined,
         }));
     }
     ellipse(options) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         const graphicsStateKey = this.maybeEmbedGraphicsState({
-            opacity: options === null || options === void 0 ? void 0 : options.opacity,
-            borderOpacity: options === null || options === void 0 ? void 0 : options.borderOpacity,
-            blendMode: options === null || options === void 0 ? void 0 : options.blendMode,
+            opacity: options?.opacity,
+            borderOpacity: options?.borderOpacity,
+            blendMode: options?.blendMode,
         });
         const contentStream = this.getContentStream();
-        contentStream.push(...pdf_lib_1.drawEllipse({
-            x: (_a = options === null || options === void 0 ? void 0 : options.x) !== null && _a !== void 0 ? _a : this.x,
-            y: this.convertY((_b = options === null || options === void 0 ? void 0 : options.y) !== null && _b !== void 0 ? _b : this.y),
-            xScale: (_c = options === null || options === void 0 ? void 0 : options.xScale) !== null && _c !== void 0 ? _c : 100,
-            yScale: (_d = options === null || options === void 0 ? void 0 : options.yScale) !== null && _d !== void 0 ? _d : 100,
-            rotate: (_e = options === null || options === void 0 ? void 0 : options.rotate) !== null && _e !== void 0 ? _e : undefined,
-            color: (_f = options === null || options === void 0 ? void 0 : options.color) !== null && _f !== void 0 ? _f : ((options === null || options === void 0 ? void 0 : options.borderColor) ? undefined : pdf_lib_1.rgb(0, 0, 0)),
-            borderColor: (_g = options === null || options === void 0 ? void 0 : options.borderColor) !== null && _g !== void 0 ? _g : undefined,
-            borderWidth: (_h = options === null || options === void 0 ? void 0 : options.borderWidth) !== null && _h !== void 0 ? _h : 0,
-            borderDashArray: (_j = options === null || options === void 0 ? void 0 : options.borderDashArray) !== null && _j !== void 0 ? _j : undefined,
-            borderDashPhase: (_k = options === null || options === void 0 ? void 0 : options.borderDashPhase) !== null && _k !== void 0 ? _k : undefined,
-            borderLineCap: (_l = options === null || options === void 0 ? void 0 : options.borderLineCap) !== null && _l !== void 0 ? _l : undefined,
+        contentStream.push(...drawEllipse({
+            x: options?.x ?? this.x,
+            y: this.convertY(options?.y ?? this.y),
+            xScale: options?.xScale ?? 100,
+            yScale: options?.yScale ?? 100,
+            rotate: options?.rotate ?? undefined,
+            color: options?.color ?? (options?.borderColor ? undefined : rgb(0, 0, 0)),
+            borderColor: options?.borderColor ?? undefined,
+            borderWidth: options?.borderWidth ?? 0,
+            borderDashArray: options?.borderDashArray ?? undefined,
+            borderDashPhase: options?.borderDashPhase ?? undefined,
+            borderLineCap: options?.borderLineCap ?? undefined,
             graphicsState: graphicsStateKey,
         }));
     }
     line(options) {
-        var _a, _b, _c, _d, _e;
         const graphicsStateKey = this.maybeEmbedGraphicsState({
             borderOpacity: options.opacity,
             blendMode: options.blendMode,
         });
         const contentStream = this.getContentStream();
-        contentStream.push(...pdf_lib_1.drawLine({
+        contentStream.push(...drawLine({
             start: {
                 x: options.start.x,
                 y: this.convertY(options.start.y),
@@ -297,36 +272,35 @@ class PDFDocumentBuilder {
                 x: options.end.x,
                 y: this.convertY(options.end.y),
             },
-            thickness: (_a = options.thickness) !== null && _a !== void 0 ? _a : 1,
-            color: (_b = options.color) !== null && _b !== void 0 ? _b : pdf_lib_1.rgb(0, 0, 0),
-            dashArray: (_c = options.dashArray) !== null && _c !== void 0 ? _c : undefined,
-            dashPhase: (_d = options.dashPhase) !== null && _d !== void 0 ? _d : undefined,
-            lineCap: (_e = options.lineCap) !== null && _e !== void 0 ? _e : undefined,
+            thickness: options.thickness ?? 1,
+            color: options.color ?? rgb(0, 0, 0),
+            dashArray: options.dashArray ?? undefined,
+            dashPhase: options.dashPhase ?? undefined,
+            lineCap: options.lineCap ?? undefined,
             graphicsState: graphicsStateKey,
         }));
     }
     svgPath(path, options) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const graphicsStateKey = this.maybeEmbedGraphicsState({
             opacity: options.opacity,
             borderOpacity: options.borderOpacity,
             blendMode: options.blendMode,
         });
         if (!options.color && !options.borderColor) {
-            options.borderColor = pdf_lib_1.rgb(0, 0, 0);
+            options.borderColor = rgb(0, 0, 0);
         }
         const contentStream = this.getContentStream();
-        contentStream.push(...pdf_lib_1.drawSvgPath(path, {
-            x: (_a = options.x) !== null && _a !== void 0 ? _a : this.x,
-            y: this.convertY((_b = options.y) !== null && _b !== void 0 ? _b : this.y),
+        contentStream.push(...drawSvgPath(path, {
+            x: options.x ?? this.x,
+            y: this.convertY(options.y ?? this.y),
             scale: options.scale,
-            rotate: (_c = options.rotate) !== null && _c !== void 0 ? _c : pdf_lib_1.degrees(0),
-            color: (_d = options.color) !== null && _d !== void 0 ? _d : undefined,
-            borderColor: (_e = options.borderColor) !== null && _e !== void 0 ? _e : undefined,
-            borderWidth: (_f = options.borderWidth) !== null && _f !== void 0 ? _f : 0,
-            borderDashArray: (_g = options.borderDashArray) !== null && _g !== void 0 ? _g : undefined,
-            borderDashPhase: (_h = options.borderDashPhase) !== null && _h !== void 0 ? _h : undefined,
-            borderLineCap: (_j = options.borderLineCap) !== null && _j !== void 0 ? _j : undefined,
+            rotate: options.rotate ?? degrees(0),
+            color: options.color ?? undefined,
+            borderColor: options.borderColor ?? undefined,
+            borderWidth: options.borderWidth ?? 0,
+            borderDashArray: options.borderDashArray ?? undefined,
+            borderDashPhase: options.borderDashPhase ?? undefined,
+            borderLineCap: options.borderLineCap ?? undefined,
             graphicsState: graphicsStateKey,
         }));
     }
@@ -336,8 +310,8 @@ class PDFDocumentBuilder {
     hexColor(hex) {
         const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
-            ? pdf_lib_1.rgb(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
-            : pdf_lib_1.rgb(0, 0, 0);
+            ? rgb(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
+            : rgb(0, 0, 0);
     }
     switchToPage(index) {
         if (index === this.pageIndex) {
@@ -404,7 +378,7 @@ class PDFDocumentBuilder {
     }
     createContentStream(...operators) {
         const dict = this.doc.context.obj({});
-        const contentStream = pdf_lib_1.PDFContentStream.of(dict, operators);
+        const contentStream = PDFContentStream.of(dict, operators);
         return contentStream;
     }
     maybeEmbedGraphicsState(options) {
@@ -412,16 +386,15 @@ class PDFDocumentBuilder {
         if (opacity === undefined && borderOpacity === undefined && blendMode === undefined) {
             return undefined;
         }
-        const key = pdf_lib_1.addRandomSuffix('GS', 10);
+        const key = addRandomSuffix('GS', 10);
         const graphicsState = this.doc.context.obj({
             Type: 'ExtGState',
             ca: opacity,
             CA: borderOpacity,
             BM: blendMode,
         });
-        this.page.node.setExtGState(pdf_lib_1.PDFName.of(key), graphicsState);
+        this.page.node.setExtGState(PDFName.of(key), graphicsState);
         return key;
     }
 }
-exports.default = PDFDocumentBuilder;
 //# sourceMappingURL=main.js.map

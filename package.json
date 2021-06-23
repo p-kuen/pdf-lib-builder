@@ -2,9 +2,10 @@
   "name": "pdf-lib-builder",
   "version": "1.0.1",
   "description": "A builder based on pdf-lib",
-  "main": "build/main.js",
+  "main": "build/commonjs/main.js",
+  "module": "build/esm/main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -m ES2020 --outDir build/esm && tsc -m commonjs --outDir build/commonjs",
     "build:watch": "tsc --watch",
     "test": "jasmine"
   },
