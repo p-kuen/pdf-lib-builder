@@ -31,7 +31,7 @@ import {
   TextAlignment,
 } from 'pdf-lib'
 
-import { readFileSync } from 'fs'
+import {readFileSync} from 'fs'
 
 interface Margins {
   top: number
@@ -89,7 +89,7 @@ export class PDFDocumentBuilder {
     }
 
     const defaultOptions: PDFDocumentBuilderOptions = {
-      margins: { top: 72, bottom: 72, left: 72, right: 72 },
+      margins: {top: 72, bottom: 72, left: 72, right: 72},
     }
 
     this.options = Object.assign(defaultOptions, options)
@@ -265,7 +265,7 @@ export class PDFDocumentBuilder {
       image = input
     } else {
       const fileContent = readFileSync(input)
-      const { fromBuffer } = await import('file-type')
+      const {fromBuffer} = await import('file-type')
       const fileType = await fromBuffer(fileContent)
 
       if (!fileType) {
@@ -534,7 +534,7 @@ export class PDFDocumentBuilder {
     borderOpacity?: number
     blendMode?: BlendMode
   }): string | undefined {
-    const { opacity, borderOpacity, blendMode } = options
+    const {opacity, borderOpacity, blendMode} = options
 
     if (opacity === undefined && borderOpacity === undefined && blendMode === undefined) {
       return undefined

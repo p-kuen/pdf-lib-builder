@@ -1,10 +1,15 @@
+import {createServer} from 'http'
+import {PDFDocument, radians, rgb, StandardFonts, TextAlignment} from 'pdf-lib'
+import {request} from 'gibma'
 import {PDFDocumentBuilder} from 'pdf-lib-builder'
 
 const port = 4000
 
 createServer(async (req, res) => {
   const doc = await PDFDocument.create()
-  const builder = new PDFDocumentBuilder(doc, { margins: { top: 32, right: 25, left: 70, bottom: 50 } })
+  const builder = new PDFDocumentBuilder(doc, {
+    margins: {top: 32, right: 25, left: 70, bottom: 50},
+  })
 
   builder.text('This is a test document')
   builder.text('This should be rendered on next line.')
@@ -20,8 +25,8 @@ createServer(async (req, res) => {
 
   const boldFont = doc.embedStandardFont(StandardFonts.HelveticaBold)
 
-  builder.text('This text should be bold', { font: boldFont })
-  builder.text('This should be big', { size: 48 })
+  builder.text('This text should be bold', {font: boldFont})
+  builder.text('This should be big', {size: 48})
 
   // jpg=ArrayBuffer
   const url = 'https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg'
@@ -29,15 +34,15 @@ createServer(async (req, res) => {
   const string = await request(url).then((res) => res.data)
   const image = await doc.embedJpg(Buffer.from(string!))
 
-  builder.image(image, { x: 10, y: 10, fit: { height: 100 }, opacity: 0.2 })
+  builder.image(image, {x: 10, y: 10, fit: {height: 100}, opacity: 0.2})
 
-  builder.image(image, { fit: { height: 100 } })
+  builder.image(image, {fit: {height: 100}})
 
   builder.moveDown()
 
   builder.text('This should show on next page with automatic wrapping')
 
-  builder.text('This should not break', { lineBreak: false })
+  builder.text('This should not break', {lineBreak: false})
   builder.text('This should be placed right next to the previous line and should break')
   builder.x = builder.options.margins.left
 
@@ -110,7 +115,7 @@ createServer(async (req, res) => {
 
   builder.moveDown(1)
 
-  builder.ellipse({ xScale: 10, yScale: 10 })
+  builder.ellipse({xScale: 10, yScale: 10})
 
   builder.moveDown(1)
 
@@ -126,9 +131,9 @@ createServer(async (req, res) => {
     maxLines: 1,
   })
 
-  builder.svgPath('M 10,10 L 10,20 L 20,10 L 10,10', { x: 10, y: 10 })
+  builder.svgPath('M 10,10 L 10,20 L 20,10 L 10,10', {x: 10, y: 10})
 
-  res.write(await doc.save({ useObjectStreams: true }))
+  res.write(await doc.save({useObjectStreams: true}))
   res.end()
 }).listen(port)
 
