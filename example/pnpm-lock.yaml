@@ -1,25 +1,25 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@types/node': ^15.6.1
+  '@types/node': ^15.12.4
   gibma: ^0.4.1
   pdf-lib-builder: link:..
-  tsc-watch: ^4.2.9
-  typescript: ^4.2.4
+  tsc-watch: ^4.4.0
+  typescript: ^4.3.4
 
 dependencies:
   gibma: 0.4.1
   pdf-lib-builder: link:..
 
 devDependencies:
-  '@types/node': 15.6.1
-  tsc-watch: 4.2.9_typescript@4.2.4
-  typescript: 4.2.4
+  '@types/node': 15.12.4
+  tsc-watch: 4.4.0_typescript@4.3.4
+  typescript: 4.3.4
 
 packages:
 
-  /@types/node/15.6.1:
-    resolution: {integrity: sha512-7EIraBEyRHEe7CH+Fm1XvgqU6uwZN8Q7jppJGcqjROMT29qhAuuOxYB1uEY5UMYQKEmA5D+5tBnhdaPXSsLONA==}
+  /@types/node/15.12.4:
+    resolution: {integrity: sha512-zrNj1+yqYF4WskCMOHwN+w9iuD12+dGm0rQ35HLl9/Ouuq52cEtd0CH9qMgrdNmi5ejC1/V7vKEXYubB+65DkA==}
     dev: true
 
   /ansi-regex/5.0.0:
@@ -138,8 +138,8 @@ packages:
     resolution: {integrity: sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=}
     dev: true
 
-  /tsc-watch/4.2.9_typescript@4.2.4:
-    resolution: {integrity: sha512-DlTaoDs74+KUpyWr7dCGhuscAUKCz6CiFduBN7R9RbLJSSN1moWdwoCLASE7+zLgGvV5AwXfYDiEMAsPGaO+Vw==}
+  /tsc-watch/4.4.0_typescript@4.3.4:
+    resolution: {integrity: sha512-+0Yey6ptOOXAnt44OKTk2/EnQnmA0auL7VWXm9d9abMS4tabt0Xdr9B4AK6OJbWAre9ZdLA81+Nk8sz9unptyA==}
     engines: {node: '>=8.17.0'}
     hasBin: true
     peerDependencies:
@@ -150,11 +150,11 @@ packages:
       ps-tree: 1.2.0
       string-argv: 0.1.2
       strip-ansi: 6.0.0
-      typescript: 4.2.4
+      typescript: 4.3.4
     dev: true
 
-  /typescript/4.2.4:
-    resolution: {integrity: sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==}
+  /typescript/4.3.4:
+    resolution: {integrity: sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
