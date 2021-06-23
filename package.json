@@ -1,6 +1,6 @@
 {
   "name": "pdf-lib-builder",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A builder based on pdf-lib",
   "main": "build/commonjs/main.js",
   "module": "build/esm/main.js",
