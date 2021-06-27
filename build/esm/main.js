@@ -1,5 +1,17 @@
 import { addRandomSuffix, breakTextIntoLines, cleanText, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, lineSplit, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, } from 'pdf-lib';
 import { readFileSync } from 'fs';
+export var RectangleAlignment;
+(function (RectangleAlignment) {
+    RectangleAlignment[RectangleAlignment["TopLeft"] = 0] = "TopLeft";
+    RectangleAlignment[RectangleAlignment["TopCenter"] = 1] = "TopCenter";
+    RectangleAlignment[RectangleAlignment["TopRight"] = 2] = "TopRight";
+    RectangleAlignment[RectangleAlignment["CenterLeft"] = 3] = "CenterLeft";
+    RectangleAlignment[RectangleAlignment["Center"] = 4] = "Center";
+    RectangleAlignment[RectangleAlignment["CenterRight"] = 5] = "CenterRight";
+    RectangleAlignment[RectangleAlignment["BottomLeft"] = 6] = "BottomLeft";
+    RectangleAlignment[RectangleAlignment["BottomCenter"] = 7] = "BottomCenter";
+    RectangleAlignment[RectangleAlignment["BottomRight"] = 8] = "BottomRight";
+})(RectangleAlignment || (RectangleAlignment = {}));
 export class PDFDocumentBuilder {
     constructor(doc, options) {
         this.fontSize = 24;
@@ -225,11 +237,21 @@ export class PDFDocumentBuilder {
         if (!options.color && !options.borderColor) {
             options.color = rgb(0, 0, 0);
         }
+        const width = options.width ?? 150;
+        const height = options.height ?? 100;
+        let x = options.x ?? this.x;
+        let y = options.y ?? this.y;
+        if (options.align === RectangleAlignment.TopCenter || options.align == RectangleAlignment.BottomCenter || options.align === RectangleAlignment.Center) {
+            x -= width / 2;
+        }
+        if (options.align === RectangleAlignment.CenterLeft || options.align == RectangleAlignment.CenterRight || options.align === RectangleAlignment.Center) {
+            y -= height / 2;
+        }
         contentStream.push(...drawRectangle({
-            x: options.x ?? this.x,
-            y: this.convertY(options.y ?? this.y) - (options.height ?? 100),
-            width: options.width ?? 150,
-            height: options.height ?? 100,
+            x,
+            y: this.convertY(y) - height,
+            width: width,
+            height: height,
             rotate: options.rotate ?? degrees(0),
             xSkew: options.xSkew ?? degrees(0),
             ySkew: options.ySkew ?? degrees(0),

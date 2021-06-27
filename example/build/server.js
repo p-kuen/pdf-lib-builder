@@ -62,12 +62,24 @@ http_1.createServer(async (req, res) => {
     });
     const [font] = builder.getFont();
     const text = 'I am on the line';
+    const rotation = pdf_lib_1.radians(Math.atan2(100, 200));
+    builder.rect({
+        x: (start.x + end.x) / 2,
+        y: (start.y + end.y) / 2,
+        width: font.widthOfTextAtSize(text, 8),
+        height: font.heightAtSize(8),
+        color: pdf_lib_1.rgb(1, 1, 1),
+        opacity: 0.5,
+        rotate: rotation,
+        align: pdf_lib_builder_1.RectangleAlignment.TopCenter
+    });
     builder.text(text, {
-        x: builder.options.margins.left + 100 - font.widthOfTextAtSize(text, 8) / 2,
-        y: builder.y + 50,
+        x: (start.x + end.x) / 2,
+        y: (start.y + end.y) / 2,
         color: pdf_lib_1.rgb(1, 1, 1),
         size: 8,
-        rotate: pdf_lib_1.radians(Math.atan2(100, 200)),
+        rotate: rotation,
+        align: pdf_lib_1.TextAlignment.Center
     });
     builder.rect({
         width: 200,

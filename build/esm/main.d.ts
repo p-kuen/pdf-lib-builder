@@ -5,6 +5,25 @@ interface Margins {
     left: number;
     right: number;
 }
+export interface Point {
+    x: number;
+    y: number;
+}
+export interface Size {
+    width: number;
+    height: number;
+}
+export declare enum RectangleAlignment {
+    TopLeft = 0,
+    TopCenter = 1,
+    TopRight = 2,
+    CenterLeft = 3,
+    Center = 4,
+    CenterRight = 5,
+    BottomLeft = 6,
+    BottomCenter = 7,
+    BottomRight = 8
+}
 export interface PDFDocumentBuilderOptions {
     margins: Margins;
 }
@@ -19,6 +38,9 @@ export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
     lineBreak?: boolean;
     align?: TextAlignment;
     maxLines?: number;
+}
+export interface PDFBuilderPageDrawRectangleOptions extends PDFPageDrawRectangleOptions {
+    align?: RectangleAlignment;
 }
 export declare class PDFDocumentBuilder {
     doc: PDFDocument;
@@ -41,7 +63,7 @@ export declare class PDFDocumentBuilder {
     setLineHeight(lineHeight: number): void;
     text(text: string, options?: PDFBuilderPageDrawTextOptions): void;
     image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<PDFImage>;
-    rect(options: PDFPageDrawRectangleOptions): void;
+    rect(options: PDFBuilderPageDrawRectangleOptions): void;
     ellipse(options?: PDFPageDrawEllipseOptions): void;
     line(options: PDFPageDrawLineOptions): void;
     svgPath(path: string, options: PDFPageDrawSVGOptions): void;
