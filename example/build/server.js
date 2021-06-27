@@ -1,16 +1,15 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = require("http");
 const pdf_lib_1 = require("pdf-lib");
 const gibma_1 = require("gibma");
-const pdf_lib_builder_1 = __importDefault(require("pdf-lib-builder"));
+const pdf_lib_builder_1 = require("pdf-lib-builder");
 const port = 4000;
 http_1.createServer(async (req, res) => {
     const doc = await pdf_lib_1.PDFDocument.create();
-    const builder = new pdf_lib_builder_1.default(doc, { margins: { top: 32, right: 25, left: 70, bottom: 50 } });
+    const builder = new pdf_lib_builder_1.PDFDocumentBuilder(doc, {
+        margins: { top: 32, right: 25, left: 70, bottom: 50 },
+    });
     builder.text('This is a test document');
     builder.text('This should be rendered on next line.');
     builder.text('On this text \nwe \nfind \nnew \nlines');
@@ -27,6 +26,10 @@ http_1.createServer(async (req, res) => {
     const image = await doc.embedJpg(Buffer.from(string));
     builder.image(image, { x: 10, y: 10, fit: { height: 100 }, opacity: 0.2 });
     builder.image(image, { fit: { height: 100 } });
+    builder.text('Image centered:');
+    builder.image(image, { fit: { height: 50 }, align: 'center' });
+    builder.text('Image align right:');
+    builder.image(image, { fit: { height: 50 }, align: 'right' });
     builder.moveDown();
     builder.text('This should show on next page with automatic wrapping');
     builder.text('This should not break', { lineBreak: false });

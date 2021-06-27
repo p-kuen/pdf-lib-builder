@@ -13,6 +13,7 @@ export interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions 
         width?: number;
         height?: number;
     };
+    align?: AlignSetting;
 }
 export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
     lineBreak?: boolean;
@@ -39,7 +40,7 @@ export declare class PDFDocumentBuilder {
     setFontSize(size: number): void;
     setLineHeight(lineHeight: number): void;
     text(text: string, options?: PDFBuilderPageDrawTextOptions): void;
-    image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<void>;
+    image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<PDFImage>;
     rect(options: PDFPageDrawRectangleOptions): void;
     ellipse(options?: PDFPageDrawEllipseOptions): void;
     line(options: PDFPageDrawLineOptions): void;

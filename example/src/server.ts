@@ -38,6 +38,11 @@ createServer(async (req, res) => {
 
   builder.image(image, {fit: {height: 100}})
 
+  builder.text('Image centered:')
+  builder.image(image, {fit: {height: 50}, align: 'center'})
+  builder.text('Image align right:')
+  builder.image(image, {fit: {height: 50}, align: 'right'})
+
   builder.moveDown()
 
   builder.text('This should show on next page with automatic wrapping')

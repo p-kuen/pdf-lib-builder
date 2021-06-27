@@ -48,7 +48,8 @@ export interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions 
   fit?: {
     width?: number
     height?: number
-  }
+  },
+  align?: AlignSetting
 }
 
 export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
@@ -286,6 +287,12 @@ export class PDFDocumentBuilder {
       options.height = fitDims.height
     }
 
+    if (options?.align === 'center') {
+      options.x = (this.page.getWidth() - (options.width || image.width)) / 2
+    } else if (options?.align === 'right') {
+      options.x = this.page.getWidth() - (options.width || image.width) - this.options.margins.right
+    }
+
     // at this point, let's check if there is enough space for the lines on this page
     if (this.y + (options?.height || image.height) > this.maxY) {
       this.nextPage()
@@ -318,6 +325,8 @@ export class PDFDocumentBuilder {
     if (options?.y === undefined) {
       this.page.moveDown(options?.height || image.height)
     }
+
+    return image
   }
 
   rect(options: PDFPageDrawRectangleOptions) {
