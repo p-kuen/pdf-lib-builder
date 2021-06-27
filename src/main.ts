@@ -29,6 +29,8 @@ import {
   rgb,
   StandardFonts,
   TextAlignment,
+  toRadians,
+  radians
 } from 'pdf-lib'
 
 import {readFileSync} from 'fs'
@@ -373,13 +375,14 @@ export class PDFDocumentBuilder {
 
     let x = options.x ?? this.x
     let y = options.y ?? this.y
+    const angleRad = toRadians(options.rotate ?? radians(0))
 
     if (options.align === RectangleAlignment.TopCenter || options.align == RectangleAlignment.BottomCenter || options.align === RectangleAlignment.Center) {
-      x -= width / 2
+      x -= ((width / 2) * Math.cos(angleRad) - (height / 2) * Math.sin(angleRad))
     }
 
     if (options.align === RectangleAlignment.CenterLeft || options.align == RectangleAlignment.CenterRight || options.align === RectangleAlignment.Center) {
-      y -= height / 2
+      y += ((width / 2) * Math.sin(angleRad) + (height / 2) * Math.cos(angleRad)) - height
     }
 
     contentStream.push(
@@ -388,7 +391,7 @@ export class PDFDocumentBuilder {
         y: this.convertY(y) - height,
         width: width,
         height: height,
-        rotate: options.rotate ?? degrees(0),
+        rotate: options.rotate ?? radians(0),
         xSkew: options.xSkew ?? degrees(0),
         ySkew: options.ySkew ?? degrees(0),
         borderWidth: options.borderWidth ?? 0,

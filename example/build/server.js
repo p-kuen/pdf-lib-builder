@@ -117,6 +117,49 @@ http_1.createServer(async (req, res) => {
         maxLines: 1,
     });
     builder.svgPath('M 10,10 L 10,20 L 20,10 L 10,10', { x: 10, y: 10 });
+    builder.nextPage();
+    builder.x = builder.options.margins.left;
+    builder.y = builder.options.margins.top;
+    // we will draw a coordinate system here
+    const size = 300;
+    const x = builder.x;
+    const y = builder.y;
+    builder.line({
+        start: { x: x, y: y + size / 2 },
+        end: { x: x + size, y: y + size / 2 },
+        color: pdf_lib_1.rgb(0, 0, 0)
+    });
+    builder.line({
+        start: { x: x + size / 2, y: y },
+        end: { x: x + size / 2, y: y + size },
+        color: pdf_lib_1.rgb(0, 0, 0)
+    });
+    // we will now draw a rectangle
+    builder.rect({
+        x: x + size / 2,
+        y: y + size / 2,
+        align: pdf_lib_builder_1.RectangleAlignment.Center,
+        width: 30,
+        height: 10,
+        color: pdf_lib_1.rgb(0, 0, 0),
+        opacity: 0.4
+    });
+    const width = 30;
+    const height = 10;
+    const angle = 90;
+    const angleRad = pdf_lib_1.degreesToRadians(angle);
+    builder.rect({
+        x: x + size / 2,
+        y: y + size / 2,
+        align: pdf_lib_builder_1.RectangleAlignment.Center,
+        width,
+        height,
+        color: pdf_lib_1.rgb(1, 0, 0),
+        opacity: 0.4,
+        rotate: pdf_lib_1.degrees(angle)
+    });
+    builder.y += size;
+    builder.moveDown(3);
     res.write(await doc.save({ useObjectStreams: true }));
     res.end();
 }).listen(port);
