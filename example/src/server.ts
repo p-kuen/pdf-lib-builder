@@ -1,7 +1,7 @@
 import {createServer} from 'http'
 import {PDFDocument, radians, rgb, StandardFonts, TextAlignment} from 'pdf-lib'
 import {request} from 'gibma'
-import {PDFDocumentBuilder} from 'pdf-lib-builder'
+import {PDFDocumentBuilder, Point, RectangleAlignment} from 'pdf-lib-builder'
 
 const port = 4000
 
@@ -84,12 +84,25 @@ createServer(async (req, res) => {
 
   const [font] = builder.getFont()
   const text = 'I am on the line'
+  const rotation = radians(Math.atan2(100, 200))
+  builder.rect({
+    x: (start.x + end.x) / 2,
+    y: (start.y + end.y) / 2,
+    width: font.widthOfTextAtSize(text, 8),
+    height: font.heightAtSize(8),
+    color: rgb(1, 1, 1),
+    opacity: 0.5,
+    rotate: rotation,
+    align: RectangleAlignment.TopCenter
+  })
+
   builder.text(text, {
-    x: builder.options.margins.left + 100 - font.widthOfTextAtSize(text, 8) / 2,
-    y: builder.y + 50,
+    x: (start.x + end.x) / 2,
+    y: (start.y + end.y) / 2,
     color: rgb(1, 1, 1),
     size: 8,
-    rotate: radians(Math.atan2(100, 200)),
+    rotate: rotation,
+    align: TextAlignment.Center
   })
 
   builder.rect({
