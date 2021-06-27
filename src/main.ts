@@ -40,6 +40,18 @@ interface Margins {
   right: number
 }
 
+export enum RectangleAlignment {
+  TopLeft,
+  TopCenter,
+  TopRight,
+  CenterLeft,
+  Center,
+  CenterRight,
+  BottomLeft,
+  BottomCenter,
+  BottomRight
+}
+
 export interface PDFDocumentBuilderOptions {
   margins: Margins
 }
@@ -56,6 +68,10 @@ export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
   lineBreak?: boolean
   align?: TextAlignment
   maxLines?: number
+}
+
+export interface PDFBuilderPageDrawRectangleOptions extends PDFPageDrawRectangleOptions {
+  align?: RectangleAlignment
 }
 
 export class PDFDocumentBuilder {
@@ -329,7 +345,7 @@ export class PDFDocumentBuilder {
     return image
   }
 
-  rect(options: PDFPageDrawRectangleOptions) {
+  rect(options: PDFBuilderPageDrawRectangleOptions) {
     const contentStream = this.getContentStream()
 
     const graphicsStateKey = this.maybeEmbedGraphicsState({
@@ -342,12 +358,26 @@ export class PDFDocumentBuilder {
       options.color = rgb(0, 0, 0)
     }
 
+    const width = options.width ?? 150
+    const height = options.height ?? 100
+
+    let x = options.x ?? this.x
+    let y = options.y ?? this.y
+
+    if (options.align === RectangleAlignment.TopCenter || options.align == RectangleAlignment.BottomCenter || options.align === RectangleAlignment.Center) {
+      x -= width / 2
+    }
+
+    if (options.align === RectangleAlignment.CenterLeft || options.align == RectangleAlignment.CenterRight || options.align === RectangleAlignment.Center) {
+      y -= height / 2
+    }
+
     contentStream.push(
       ...drawRectangle({
-        x: options.x ?? this.x,
-        y: this.convertY(options.y ?? this.y) - (options.height ?? 100),
-        width: options.width ?? 150,
-        height: options.height ?? 100,
+        x,
+        y: this.convertY(y) - height,
+        width: width,
+        height: height,
         rotate: options.rotate ?? degrees(0),
         xSkew: options.xSkew ?? degrees(0),
         ySkew: options.ySkew ?? degrees(0),
