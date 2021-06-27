@@ -71,7 +71,7 @@ http_1.createServer(async (req, res) => {
         color: pdf_lib_1.rgb(1, 1, 1),
         opacity: 0.5,
         rotate: rotation,
-        align: pdf_lib_builder_1.RectangleAlignment.TopCenter
+        align: pdf_lib_builder_1.RectangleAlignment.Center
     });
     builder.text(text, {
         x: (start.x + end.x) / 2,

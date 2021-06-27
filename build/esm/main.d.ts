@@ -1,4 +1,4 @@
-import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment } from 'pdf-lib';
+import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment, Rotation } from 'pdf-lib';
 interface Margins {
     top: number;
     bottom: number;
@@ -42,6 +42,7 @@ export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
 export interface PDFBuilderPageDrawRectangleOptions extends PDFPageDrawRectangleOptions {
     align?: RectangleAlignment;
 }
+export declare function rotatePoint(point: Point, rotation: Rotation): Point;
 export declare class PDFDocumentBuilder {
     doc: PDFDocument;
     page: PDFPage;

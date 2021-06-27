@@ -1,7 +1,7 @@
 import {createServer} from 'http'
 import {PDFDocument, radians, rgb, StandardFonts, TextAlignment, degrees, degreesToRadians} from 'pdf-lib'
 import {request} from 'gibma'
-import {PDFDocumentBuilder, Point, RectangleAlignment} from 'pdf-lib-builder'
+import {PDFDocumentBuilder, RectangleAlignment} from 'pdf-lib-builder'
 
 const port = 4000
 
@@ -93,7 +93,7 @@ createServer(async (req, res) => {
     color: rgb(1, 1, 1),
     opacity: 0.5,
     rotate: rotation,
-    align: RectangleAlignment.TopCenter
+    align: RectangleAlignment.Center
   })
 
   builder.text(text, {

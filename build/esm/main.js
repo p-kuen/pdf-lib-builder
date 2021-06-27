@@ -12,6 +12,13 @@ export var RectangleAlignment;
     RectangleAlignment[RectangleAlignment["BottomCenter"] = 7] = "BottomCenter";
     RectangleAlignment[RectangleAlignment["BottomRight"] = 8] = "BottomRight";
 })(RectangleAlignment || (RectangleAlignment = {}));
+export function rotatePoint(point, rotation) {
+    const rad = toRadians(rotation);
+    return {
+        x: point.x * Math.cos(rad) - point.y * Math.sin(rad),
+        y: point.x * Math.sin(rad) + point.y * Math.cos(rad)
+    };
+}
 export class PDFDocumentBuilder {
     constructor(doc, options) {
         this.fontSize = 24;
@@ -241,19 +248,21 @@ export class PDFDocumentBuilder {
         const height = options.height ?? 100;
         let x = options.x ?? this.x;
         let y = options.y ?? this.y;
-        const angleRad = toRadians(options.rotate ?? radians(0));
-        if (options.align === RectangleAlignment.TopCenter || options.align == RectangleAlignment.BottomCenter || options.align === RectangleAlignment.Center) {
-            x -= ((width / 2) * Math.cos(angleRad) - (height / 2) * Math.sin(angleRad));
+        const rotation = options.rotate ?? radians(0);
+        if (options.align === RectangleAlignment.Center) {
+            const rotationOffset = rotatePoint({ x: width / 2, y: height / 2 }, rotation);
+            x -= rotationOffset.x;
+            y += rotationOffset.y - height;
         }
-        if (options.align === RectangleAlignment.CenterLeft || options.align == RectangleAlignment.CenterRight || options.align === RectangleAlignment.Center) {
-            y += ((width / 2) * Math.sin(angleRad) + (height / 2) * Math.cos(angleRad)) - height;
+        else if (options.align !== undefined) {
+            throw new Error(`Unsupported alignment option ${options.align}`);
         }
         contentStream.push(...drawRectangle({
             x,
             y: this.convertY(y) - height,
             width: width,
             height: height,
-            rotate: options.rotate ?? radians(0),
+            rotate: rotation,
             xSkew: options.xSkew ?? degrees(0),
             ySkew: options.ySkew ?? degrees(0),
             borderWidth: options.borderWidth ?? 0,
