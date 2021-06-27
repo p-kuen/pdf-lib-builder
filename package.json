@@ -6,7 +6,7 @@
   "module": "build/esm/main.js",
   "scripts": {
     "build": "tsc -m ES2020 --outDir build/esm && tsc -m commonjs --outDir build/commonjs",
-    "build:watch": "tsc --watch",
+    "build:watch": "tsc -m commonjs --outDir build/commonjs --watch",
     "test": "jasmine"
   },
   "author": "Patrick Kuen <p.kuen@cloudacy.com>",
