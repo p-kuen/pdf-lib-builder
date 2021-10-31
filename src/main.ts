@@ -315,10 +315,10 @@ export class PDFDocumentBuilder {
       } else {
         throw new Error(`File type ${fileType.mime} could not be used as an image!`)
       }
+    }
 
-      if (options?.onLoad !== undefined) {
-        options.onLoad(image)
-      }
+    if (options?.onLoad !== undefined) {
+      options.onLoad(image)
     }
 
     if (options?.fit) {

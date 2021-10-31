@@ -192,9 +192,9 @@ export class PDFDocumentBuilder {
             else {
                 throw new Error(`File type ${fileType.mime} could not be used as an image!`);
             }
-            if (options?.onLoad !== undefined) {
-                options.onLoad(image);
-            }
+        }
+        if (options?.onLoad !== undefined) {
+            options.onLoad(image);
         }
         if (options?.fit) {
             const fitDims = image.scaleToFit(options.fit.width || image.width, options.fit.height || image.height);
