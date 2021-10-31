@@ -1,29 +1,29 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@types/node': ^15.12.4
-  gibma: ^0.4.1
+  '@types/node': ^16.11.6
+  gibma: ^0.4.2
   pdf-lib-builder: link:..
-  tsc-watch: ^4.4.0
-  typescript: ^4.3.4
+  tsc-watch: ^4.5.0
+  typescript: ^4.4.4
 
 dependencies:
-  gibma: 0.4.1
+  gibma: 0.4.2
   pdf-lib-builder: link:..
 
 devDependencies:
-  '@types/node': 15.12.4
-  tsc-watch: 4.4.0_typescript@4.3.4
-  typescript: 4.3.4
+  '@types/node': 16.11.6
+  tsc-watch: 4.5.0_typescript@4.4.4
+  typescript: 4.4.4
 
 packages:
 
-  /@types/node/15.12.4:
-    resolution: {integrity: sha512-zrNj1+yqYF4WskCMOHwN+w9iuD12+dGm0rQ35HLl9/Ouuq52cEtd0CH9qMgrdNmi5ejC1/V7vKEXYubB+65DkA==}
+  /@types/node/16.11.6:
+    resolution: {integrity: sha512-ua7PgUoeQFjmWPcoo9khiPum3Pd60k4/2ZGXt18sm2Slk0W0xZTqt5Y0Ny1NyBiN1EVQ/+FaF9NcY4Qe6rwk5w==}
     dev: true
 
-  /ansi-regex/5.0.0:
-    resolution: {integrity: sha512-bY6fj56OUQ0hU1KjFNDQuJFezqKdrAyFdIevADiqrWHwSlbmBNMHp5ak2f40Pm8JTFyM2mqxkG6ngkHO11f/lg==}
+  /ansi-regex/5.0.1:
+    resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
     dev: true
 
@@ -61,8 +61,8 @@ packages:
     resolution: {integrity: sha1-g8YK/Fi5xWmXAH7Rp2izqzA6RP4=}
     dev: true
 
-  /gibma/0.4.1:
-    resolution: {integrity: sha512-OhzynEEzgYnAhhy7Hhf0Ea9X0vVTE8DEmaMminzB1rM4pVsQQrcLYjLLSMbyrLLsbu8ejsgY/PnXe6EB0u7DIg==}
+  /gibma/0.4.2:
+    resolution: {integrity: sha512-azVMl3hb1gchrXq9AGDrmi5CjgtbjYA8hAdqUS/fmoMHpBk60VRqoft66TBBHXjWPqWzE+GsNON7Bmx7kLdo3Q==}
     dependencies:
       content-type: 1.0.4
     dev: false
@@ -127,19 +127,19 @@ packages:
     engines: {node: '>=0.6.19'}
     dev: true
 
-  /strip-ansi/6.0.0:
-    resolution: {integrity: sha512-AuvKTrTfQNYNIctbR1K/YGTR1756GycPsg7b9bdV9Duqur4gv6aKqHXah67Z8ImS7WEz5QVcOtlfW2rZEugt6w==}
+  /strip-ansi/6.0.1:
+    resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
     engines: {node: '>=8'}
     dependencies:
-      ansi-regex: 5.0.0
+      ansi-regex: 5.0.1
     dev: true
 
   /through/2.3.8:
     resolution: {integrity: sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=}
     dev: true
 
-  /tsc-watch/4.4.0_typescript@4.3.4:
-    resolution: {integrity: sha512-+0Yey6ptOOXAnt44OKTk2/EnQnmA0auL7VWXm9d9abMS4tabt0Xdr9B4AK6OJbWAre9ZdLA81+Nk8sz9unptyA==}
+  /tsc-watch/4.5.0_typescript@4.4.4:
+    resolution: {integrity: sha512-aXhN4jY+1YEcn/NwCQ/+fHqU43EqOpW+pS+933EPsVEsrKhvyrodPDIjQsk1a1niFrabAK3RIBrRbAslVefEbQ==}
     engines: {node: '>=8.17.0'}
     hasBin: true
     peerDependencies:
@@ -149,12 +149,12 @@ packages:
       node-cleanup: 2.1.2
       ps-tree: 1.2.0
       string-argv: 0.1.2
-      strip-ansi: 6.0.0
-      typescript: 4.3.4
+      strip-ansi: 6.0.1
+      typescript: 4.4.4
     dev: true
 
-  /typescript/4.3.4:
-    resolution: {integrity: sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==}
+  /typescript/4.4.4:
+    resolution: {integrity: sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true

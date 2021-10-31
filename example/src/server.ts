@@ -93,7 +93,7 @@ createServer(async (req, res) => {
     color: rgb(1, 1, 1),
     opacity: 0.5,
     rotate: rotation,
-    align: RectangleAlignment.Center
+    align: RectangleAlignment.Center,
   })
 
   builder.text(text, {
@@ -102,7 +102,7 @@ createServer(async (req, res) => {
     color: rgb(1, 1, 1),
     size: 8,
     rotate: rotation,
-    align: TextAlignment.Center
+    align: TextAlignment.Center,
   })
 
   builder.rect({
@@ -163,13 +163,13 @@ createServer(async (req, res) => {
   builder.line({
     start: {x: x, y: y + size / 2},
     end: {x: x + size, y: y + size / 2},
-    color: rgb(0, 0, 0)
+    color: rgb(0, 0, 0),
   })
 
   builder.line({
     start: {x: x + size / 2, y: y},
     end: {x: x + size / 2, y: y + size},
-    color: rgb(0, 0, 0)
+    color: rgb(0, 0, 0),
   })
 
   // we will now draw a rectangle
@@ -180,7 +180,7 @@ createServer(async (req, res) => {
     width: 30,
     height: 10,
     color: rgb(0, 0, 0),
-    opacity: 0.4
+    opacity: 0.4,
   })
 
   const width = 30
@@ -196,7 +196,7 @@ createServer(async (req, res) => {
     height,
     color: rgb(1, 0, 0),
     opacity: 0.4,
-    rotate: degrees(angle)
+    rotate: degrees(angle),
   })
 
   builder.y += size

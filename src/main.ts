@@ -31,7 +31,7 @@ import {
   TextAlignment,
   toRadians,
   radians,
-  Rotation
+  Rotation,
 } from 'pdf-lib'
 
 import {readFileSync} from 'fs'
@@ -62,7 +62,7 @@ export enum RectangleAlignment {
   CenterRight,
   BottomLeft,
   BottomCenter,
-  BottomRight
+  BottomRight,
 }
 
 export interface PDFDocumentBuilderOptions {
@@ -73,7 +73,7 @@ export interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions 
   fit?: {
     width?: number
     height?: number
-  },
+  }
   align?: AlignSetting
 }
 
@@ -91,7 +91,7 @@ export function rotatePoint(point: Point, rotation: Rotation): Point {
   const rad = toRadians(rotation)
   return {
     x: point.x * Math.cos(rad) - point.y * Math.sin(rad),
-    y: point.x * Math.sin(rad) + point.y * Math.cos(rad)
+    y: point.x * Math.sin(rad) + point.y * Math.cos(rad),
   }
 }
 
