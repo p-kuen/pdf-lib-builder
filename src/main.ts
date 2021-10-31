@@ -239,8 +239,6 @@ export class PDFDocumentBuilder {
         this.setFont(font)
         ;[font, fontKey] = this.getFont()
 
-        // Move to the top of the new page
-        this.moveTo(this.options.margins.left, this.options.margins.top)
         this.setFontSize(this.fontSize)
         contentStream = this.getContentStream(false)
         graphicsStateKey = this.maybeEmbedGraphicsState({
@@ -333,7 +331,6 @@ export class PDFDocumentBuilder {
     // at this point, let's check if there is enough space for the lines on this page
     if (this.y + (options?.height || image.height) > this.maxY) {
       this.nextPage()
-      this.moveTo(this.options.margins.left, this.options.margins.top)
     }
 
     const xObjectKey = addRandomSuffix('Image', 10)
@@ -500,6 +497,13 @@ export class PDFDocumentBuilder {
     this.page.moveTo(x, this.convertY(y))
   }
 
+  /**
+   * Resets the position to the top left of the page.
+   */
+  resetPosition() {
+    this.moveTo(this.options.margins.left, this.options.margins.right)
+  }
+
   hexColor(hex: string) {
     const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result
@@ -531,11 +535,15 @@ export class PDFDocumentBuilder {
     this.setFont(this.font)
   }
 
-  nextPage() {
+  nextPage(options?: {keepPosition: boolean}) {
     if (this.isLastPage) {
       this.addPage()
     } else {
       this.switchToPage(this.pageIndex + 1)
+    }
+
+    if (options?.keepPosition !== true) {
+      this.resetPosition()
     }
   }
 
