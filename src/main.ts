@@ -75,6 +75,7 @@ export interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions 
     height?: number
   }
   align?: AlignSetting
+  onLoad?: (image: PDFImage) => void
 }
 
 export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
@@ -313,6 +314,10 @@ export class PDFDocumentBuilder {
         image = await this.doc.embedPng(fileContent)
       } else {
         throw new Error(`File type ${fileType.mime} could not be used as an image!`)
+      }
+
+      if (options?.onLoad !== undefined) {
+        options.onLoad(image)
       }
     }
 
