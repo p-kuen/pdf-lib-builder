@@ -1,4 +1,4 @@
-import { addRandomSuffix, breakTextIntoLines, cleanText, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, lineSplit, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, toRadians, radians } from 'pdf-lib';
+import { addRandomSuffix, breakTextIntoLines, cleanText, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, lineSplit, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, toRadians, radians, } from 'pdf-lib';
 import { readFileSync } from 'fs';
 export var RectangleAlignment;
 (function (RectangleAlignment) {
@@ -16,7 +16,7 @@ export function rotatePoint(point, rotation) {
     const rad = toRadians(rotation);
     return {
         x: point.x * Math.cos(rad) - point.y * Math.sin(rad),
-        y: point.x * Math.sin(rad) + point.y * Math.cos(rad)
+        y: point.x * Math.sin(rad) + point.y * Math.cos(rad),
     };
 }
 export class PDFDocumentBuilder {
@@ -122,8 +122,6 @@ export class PDFDocumentBuilder {
                 // Add font to directory on the new page and get the font key
                 this.setFont(font);
                 [font, fontKey] = this.getFont();
-                // Move to the top of the new page
-                this.moveTo(this.options.margins.left, this.options.margins.top);
                 this.setFontSize(this.fontSize);
                 contentStream = this.getContentStream(false);
                 graphicsStateKey = this.maybeEmbedGraphicsState({
@@ -194,6 +192,9 @@ export class PDFDocumentBuilder {
             else {
                 throw new Error(`File type ${fileType.mime} could not be used as an image!`);
             }
+            if (options?.onLoad !== undefined) {
+                options.onLoad(image);
+            }
         }
         if (options?.fit) {
             const fitDims = image.scaleToFit(options.fit.width || image.width, options.fit.height || image.height);
@@ -209,7 +210,6 @@ export class PDFDocumentBuilder {
         // at this point, let's check if there is enough space for the lines on this page
         if (this.y + (options?.height || image.height) > this.maxY) {
             this.nextPage();
-            this.moveTo(this.options.margins.left, this.options.margins.top);
         }
         const xObjectKey = addRandomSuffix('Image', 10);
         this.page.node.setXObject(PDFName.of(xObjectKey), image.ref);
@@ -346,6 +346,12 @@ export class PDFDocumentBuilder {
     moveTo(x, y) {
         this.page.moveTo(x, this.convertY(y));
     }
+    /**
+     * Resets the position to the top left of the page.
+     */
+    resetPosition() {
+        this.moveTo(this.options.margins.left, this.options.margins.right);
+    }
     hexColor(hex) {
         const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
@@ -371,12 +377,15 @@ export class PDFDocumentBuilder {
         // add current font to dictionary
         this.setFont(this.font);
     }
-    nextPage() {
+    nextPage(options) {
         if (this.isLastPage) {
             this.addPage();
         }
         else {
             this.switchToPage(this.pageIndex + 1);
+        }
+        if (options?.keepPosition !== true) {
+            this.resetPosition();
         }
     }
     setFontColor(fontColor) {
@@ -404,6 +413,15 @@ export class PDFDocumentBuilder {
     set y(newY) {
         this.page.moveTo(this.page.getX(), this.page.getHeight() - newY);
     }
+    /**
+     * @returns calculated maximum x-value using the page width minus right margin
+     */
+    get maxX() {
+        return this.page.getWidth() - this.options.margins.right;
+    }
+    /**
+     * @returns calculated maximum y-value using the page height minus bottom margin
+     */
     get maxY() {
         return this.page.getHeight() - this.options.margins.bottom;
     }

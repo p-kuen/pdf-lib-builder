@@ -33,6 +33,7 @@ export interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions 
         height?: number;
     };
     align?: AlignSetting;
+    onLoad?: (image: PDFImage) => void;
 }
 export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
     lineBreak?: boolean;
@@ -69,10 +70,16 @@ export declare class PDFDocumentBuilder {
     line(options: PDFPageDrawLineOptions): void;
     svgPath(path: string, options: PDFPageDrawSVGOptions): void;
     moveTo(x: number, y: number): void;
+    /**
+     * Resets the position to the top left of the page.
+     */
+    resetPosition(): void;
     hexColor(hex: string): import("pdf-lib").RGB;
     switchToPage(index: number): void;
     addPage(): void;
-    nextPage(): void;
+    nextPage(options?: {
+        keepPosition: boolean;
+    }): void;
     setFontColor(fontColor: Color): void;
     private convertY;
     get lineHeight(): number;
@@ -81,6 +88,13 @@ export declare class PDFDocumentBuilder {
     get y(): number;
     set x(newX: number);
     set y(newY: number);
+    /**
+     * @returns calculated maximum x-value using the page width minus right margin
+     */
+    get maxX(): number;
+    /**
+     * @returns calculated maximum y-value using the page height minus bottom margin
+     */
     get maxY(): number;
     getContentStream(useExisting?: boolean): PDFContentStream;
     private createContentStream;

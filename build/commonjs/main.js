@@ -35,17 +35,17 @@ var RectangleAlignment;
     RectangleAlignment[RectangleAlignment["BottomRight"] = 8] = "BottomRight";
 })(RectangleAlignment = exports.RectangleAlignment || (exports.RectangleAlignment = {}));
 function rotatePoint(point, rotation) {
-    const rad = pdf_lib_1.toRadians(rotation);
+    const rad = (0, pdf_lib_1.toRadians)(rotation);
     return {
         x: point.x * Math.cos(rad) - point.y * Math.sin(rad),
-        y: point.x * Math.sin(rad) + point.y * Math.cos(rad)
+        y: point.x * Math.sin(rad) + point.y * Math.cos(rad),
     };
 }
 exports.rotatePoint = rotatePoint;
 class PDFDocumentBuilder {
     constructor(doc, options) {
         this.fontSize = 24;
-        this.fontColor = pdf_lib_1.rgb(0, 0, 0);
+        this.fontColor = (0, pdf_lib_1.rgb)(0, 0, 0);
         /** The factor a line is larger than it's font size */
         this.lineHeightFactor = 1.3;
         this.pageIndex = 0;
@@ -70,7 +70,7 @@ class PDFDocumentBuilder {
     }
     setFont(font) {
         this.font = font;
-        this.fontKey = pdf_lib_1.addRandomSuffix(this.font.name);
+        this.fontKey = (0, pdf_lib_1.addRandomSuffix)(this.font.name);
         this.page.node.setFontDictionary(pdf_lib_1.PDFName.of(this.fontKey), this.font.ref);
     }
     getFont() {
@@ -107,8 +107,8 @@ class PDFDocumentBuilder {
         const fontSize = options.size || this.fontSize;
         const textWidth = (t) => font.widthOfTextAtSize(t, fontSize);
         const textLines = options.maxWidth === undefined
-            ? pdf_lib_1.lineSplit(pdf_lib_1.cleanText(text))
-            : pdf_lib_1.breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
+            ? (0, pdf_lib_1.lineSplit)((0, pdf_lib_1.cleanText)(text))
+            : (0, pdf_lib_1.breakTextIntoLines)(text, wordBreaks, options.maxWidth, textWidth);
         const encodedLines = [];
         let i = 0;
         for (const text of textLines) {
@@ -119,7 +119,7 @@ class PDFDocumentBuilder {
             // if this is a cut off line add an ellipsis
             if (i === (options?.maxLines || Infinity) - 1 && textLines.length > i + 1) {
                 const ellipsis = '…';
-                encodedLines.push(font.encodeText(pdf_lib_1.breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
+                encodedLines.push(font.encodeText((0, pdf_lib_1.breakTextIntoLines)(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
             }
             else {
                 encodedLines.push(font.encodeText(text));
@@ -128,9 +128,9 @@ class PDFDocumentBuilder {
         }
         let contentStream = this.getContentStream();
         const color = options.color || this.fontColor;
-        const rotate = options.rotate || pdf_lib_1.degrees(0);
-        const xSkew = options.xSkew || pdf_lib_1.degrees(0);
-        const ySkew = options.ySkew || pdf_lib_1.degrees(0);
+        const rotate = options.rotate || (0, pdf_lib_1.degrees)(0);
+        const xSkew = options.xSkew || (0, pdf_lib_1.degrees)(0);
+        const ySkew = options.ySkew || (0, pdf_lib_1.degrees)(0);
         const lineHeight = options.lineHeight || fontSize * this.lineHeightFactor;
         let graphicsStateKey = this.maybeEmbedGraphicsState({
             opacity: options.opacity,
@@ -145,8 +145,6 @@ class PDFDocumentBuilder {
                 // Add font to directory on the new page and get the font key
                 this.setFont(font);
                 [font, fontKey] = this.getFont();
-                // Move to the top of the new page
-                this.moveTo(this.options.margins.left, this.options.margins.top);
                 this.setFontSize(this.fontSize);
                 contentStream = this.getContentStream(false);
                 graphicsStateKey = this.maybeEmbedGraphicsState({
@@ -165,7 +163,7 @@ class PDFDocumentBuilder {
                 }
             }
             this.page.moveDown(fontSize);
-            const operators = pdf_lib_1.drawText(line, {
+            const operators = (0, pdf_lib_1.drawText)(line, {
                 color,
                 font: fontKey,
                 size: fontSize,
@@ -201,7 +199,7 @@ class PDFDocumentBuilder {
             image = input;
         }
         else {
-            const fileContent = fs_1.readFileSync(input);
+            const fileContent = (0, fs_1.readFileSync)(input);
             const { fromBuffer } = await Promise.resolve().then(() => __importStar(require('file-type')));
             const fileType = await fromBuffer(fileContent);
             if (!fileType) {
@@ -216,6 +214,9 @@ class PDFDocumentBuilder {
             }
             else {
                 throw new Error(`File type ${fileType.mime} could not be used as an image!`);
+            }
+            if (options?.onLoad !== undefined) {
+                options.onLoad(image);
             }
         }
         if (options?.fit) {
@@ -232,23 +233,22 @@ class PDFDocumentBuilder {
         // at this point, let's check if there is enough space for the lines on this page
         if (this.y + (options?.height || image.height) > this.maxY) {
             this.nextPage();
-            this.moveTo(this.options.margins.left, this.options.margins.top);
         }
-        const xObjectKey = pdf_lib_1.addRandomSuffix('Image', 10);
+        const xObjectKey = (0, pdf_lib_1.addRandomSuffix)('Image', 10);
         this.page.node.setXObject(pdf_lib_1.PDFName.of(xObjectKey), image.ref);
         const graphicsStateKey = this.maybeEmbedGraphicsState({
             opacity: options?.opacity,
             blendMode: options?.blendMode,
         });
         const contentStream = this.getContentStream();
-        contentStream.push(...pdf_lib_1.drawImage(xObjectKey, {
+        contentStream.push(...(0, pdf_lib_1.drawImage)(xObjectKey, {
             x: options?.x ?? this.x,
             y: this.convertY(options?.y ?? this.y) - (options?.height || image.height),
             width: options?.width ?? image.size().width,
             height: options?.height ?? image.size().height,
-            rotate: options?.rotate ?? pdf_lib_1.degrees(0),
-            xSkew: options?.xSkew ?? pdf_lib_1.degrees(0),
-            ySkew: options?.ySkew ?? pdf_lib_1.degrees(0),
+            rotate: options?.rotate ?? (0, pdf_lib_1.degrees)(0),
+            xSkew: options?.xSkew ?? (0, pdf_lib_1.degrees)(0),
+            ySkew: options?.ySkew ?? (0, pdf_lib_1.degrees)(0),
             graphicsState: graphicsStateKey,
         }));
         // if the image is in the text flow, move down to set position after the image
@@ -265,13 +265,13 @@ class PDFDocumentBuilder {
             blendMode: options.blendMode,
         });
         if (!options.color && !options.borderColor) {
-            options.color = pdf_lib_1.rgb(0, 0, 0);
+            options.color = (0, pdf_lib_1.rgb)(0, 0, 0);
         }
         const width = options.width ?? 150;
         const height = options.height ?? 100;
         let x = options.x ?? this.x;
         let y = options.y ?? this.y;
-        const rotation = options.rotate ?? pdf_lib_1.radians(0);
+        const rotation = options.rotate ?? (0, pdf_lib_1.radians)(0);
         if (options.align === RectangleAlignment.Center) {
             const rotationOffset = rotatePoint({ x: width / 2, y: height / 2 }, rotation);
             x -= rotationOffset.x;
@@ -280,14 +280,14 @@ class PDFDocumentBuilder {
         else if (options.align !== undefined) {
             throw new Error(`Unsupported alignment option ${options.align}`);
         }
-        contentStream.push(...pdf_lib_1.drawRectangle({
+        contentStream.push(...(0, pdf_lib_1.drawRectangle)({
             x,
             y: this.convertY(y) - height,
             width: width,
             height: height,
             rotate: rotation,
-            xSkew: options.xSkew ?? pdf_lib_1.degrees(0),
-            ySkew: options.ySkew ?? pdf_lib_1.degrees(0),
+            xSkew: options.xSkew ?? (0, pdf_lib_1.degrees)(0),
+            ySkew: options.ySkew ?? (0, pdf_lib_1.degrees)(0),
             borderWidth: options.borderWidth ?? 0,
             color: options.color ?? undefined,
             borderColor: options.borderColor ?? undefined,
@@ -304,13 +304,13 @@ class PDFDocumentBuilder {
             blendMode: options?.blendMode,
         });
         const contentStream = this.getContentStream();
-        contentStream.push(...pdf_lib_1.drawEllipse({
+        contentStream.push(...(0, pdf_lib_1.drawEllipse)({
             x: options?.x ?? this.x,
             y: this.convertY(options?.y ?? this.y),
             xScale: options?.xScale ?? 100,
             yScale: options?.yScale ?? 100,
             rotate: options?.rotate ?? undefined,
-            color: options?.color ?? (options?.borderColor ? undefined : pdf_lib_1.rgb(0, 0, 0)),
+            color: options?.color ?? (options?.borderColor ? undefined : (0, pdf_lib_1.rgb)(0, 0, 0)),
             borderColor: options?.borderColor ?? undefined,
             borderWidth: options?.borderWidth ?? 0,
             borderDashArray: options?.borderDashArray ?? undefined,
@@ -325,7 +325,7 @@ class PDFDocumentBuilder {
             blendMode: options.blendMode,
         });
         const contentStream = this.getContentStream();
-        contentStream.push(...pdf_lib_1.drawLine({
+        contentStream.push(...(0, pdf_lib_1.drawLine)({
             start: {
                 x: options.start.x,
                 y: this.convertY(options.start.y),
@@ -335,7 +335,7 @@ class PDFDocumentBuilder {
                 y: this.convertY(options.end.y),
             },
             thickness: options.thickness ?? 1,
-            color: options.color ?? pdf_lib_1.rgb(0, 0, 0),
+            color: options.color ?? (0, pdf_lib_1.rgb)(0, 0, 0),
             dashArray: options.dashArray ?? undefined,
             dashPhase: options.dashPhase ?? undefined,
             lineCap: options.lineCap ?? undefined,
@@ -349,14 +349,14 @@ class PDFDocumentBuilder {
             blendMode: options.blendMode,
         });
         if (!options.color && !options.borderColor) {
-            options.borderColor = pdf_lib_1.rgb(0, 0, 0);
+            options.borderColor = (0, pdf_lib_1.rgb)(0, 0, 0);
         }
         const contentStream = this.getContentStream();
-        contentStream.push(...pdf_lib_1.drawSvgPath(path, {
+        contentStream.push(...(0, pdf_lib_1.drawSvgPath)(path, {
             x: options.x ?? this.x,
             y: this.convertY(options.y ?? this.y),
             scale: options.scale,
-            rotate: options.rotate ?? pdf_lib_1.degrees(0),
+            rotate: options.rotate ?? (0, pdf_lib_1.degrees)(0),
             color: options.color ?? undefined,
             borderColor: options.borderColor ?? undefined,
             borderWidth: options.borderWidth ?? 0,
@@ -369,11 +369,17 @@ class PDFDocumentBuilder {
     moveTo(x, y) {
         this.page.moveTo(x, this.convertY(y));
     }
+    /**
+     * Resets the position to the top left of the page.
+     */
+    resetPosition() {
+        this.moveTo(this.options.margins.left, this.options.margins.right);
+    }
     hexColor(hex) {
         const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
-            ? pdf_lib_1.rgb(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
-            : pdf_lib_1.rgb(0, 0, 0);
+            ? (0, pdf_lib_1.rgb)(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
+            : (0, pdf_lib_1.rgb)(0, 0, 0);
     }
     switchToPage(index) {
         if (index === this.pageIndex) {
@@ -394,12 +400,15 @@ class PDFDocumentBuilder {
         // add current font to dictionary
         this.setFont(this.font);
     }
-    nextPage() {
+    nextPage(options) {
         if (this.isLastPage) {
             this.addPage();
         }
         else {
             this.switchToPage(this.pageIndex + 1);
+        }
+        if (options?.keepPosition !== true) {
+            this.resetPosition();
         }
     }
     setFontColor(fontColor) {
@@ -427,6 +436,15 @@ class PDFDocumentBuilder {
     set y(newY) {
         this.page.moveTo(this.page.getX(), this.page.getHeight() - newY);
     }
+    /**
+     * @returns calculated maximum x-value using the page width minus right margin
+     */
+    get maxX() {
+        return this.page.getWidth() - this.options.margins.right;
+    }
+    /**
+     * @returns calculated maximum y-value using the page height minus bottom margin
+     */
     get maxY() {
         return this.page.getHeight() - this.options.margins.bottom;
     }
@@ -448,7 +466,7 @@ class PDFDocumentBuilder {
         if (opacity === undefined && borderOpacity === undefined && blendMode === undefined) {
             return undefined;
         }
-        const key = pdf_lib_1.addRandomSuffix('GS', 10);
+        const key = (0, pdf_lib_1.addRandomSuffix)('GS', 10);
         const graphicsState = this.doc.context.obj({
             Type: 'ExtGState',
             ca: opacity,
