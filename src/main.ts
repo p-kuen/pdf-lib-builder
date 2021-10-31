@@ -585,6 +585,16 @@ export class PDFDocumentBuilder {
     this.page.moveTo(this.page.getX(), this.page.getHeight() - newY)
   }
 
+  /**
+   * @returns calculated maximum x-value using the page width minus right margin
+   */
+  get maxX() {
+    return this.page.getWidth() - this.options.margins.right
+  }
+
+  /**
+   * @returns calculated maximum y-value using the page height minus bottom margin
+   */
   get maxY() {
     return this.page.getHeight() - this.options.margins.bottom
   }
