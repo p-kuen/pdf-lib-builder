@@ -177,8 +177,8 @@ export class PDFDocumentBuilder {
         }
         else {
             const fileContent = readFileSync(input);
-            const { fromBuffer } = await import('file-type');
-            const fileType = await fromBuffer(fileContent);
+            const { fileTypeFromBuffer } = await import('file-type');
+            const fileType = await fileTypeFromBuffer(fileContent);
             if (!fileType) {
                 console.error(`File type of file ${input} could not be determined, using JPEG!`);
                 image = await this.doc.embedJpg(fileContent);
