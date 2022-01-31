@@ -1,18 +1,18 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@types/node': ^16.11.6
-  file-type: ^16.5.3
-  pdf-lib: ^1.17.0
-  typescript: ^4.4.4
+  '@types/node': ^17.0.13
+  file-type: ^17.1.1
+  pdf-lib: ^1.17.1
+  typescript: ^4.5.5
 
 dependencies:
-  file-type: 16.5.3
-  pdf-lib: 1.17.0
+  file-type: 17.1.1
+  pdf-lib: 1.17.1
 
 devDependencies:
-  '@types/node': 16.11.6
-  typescript: 4.4.4
+  '@types/node': 17.0.13
+  typescript: 4.5.5
 
 packages:
 
@@ -32,17 +32,17 @@ packages:
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
     dev: false
 
-  /@types/node/16.11.6:
-    resolution: {integrity: sha512-ua7PgUoeQFjmWPcoo9khiPum3Pd60k4/2ZGXt18sm2Slk0W0xZTqt5Y0Ny1NyBiN1EVQ/+FaF9NcY4Qe6rwk5w==}
+  /@types/node/17.0.13:
+    resolution: {integrity: sha512-Y86MAxASe25hNzlDbsviXl8jQHb0RDvKt4c40ZJQ1Don0AAL0STLZSs4N+6gLEO55pedy7r2cLwS+ZDxPm/2Bw==}
     dev: true
 
-  /file-type/16.5.3:
-    resolution: {integrity: sha512-uVsl7iFhHSOY4bEONLlTK47iAHtNsFHWP5YE4xJfZ4rnX7S1Q3wce09XgqSC7E/xh8Ncv/be1lNoyprlUH/x6A==}
-    engines: {node: '>=10'}
+  /file-type/17.1.1:
+    resolution: {integrity: sha512-heRUMZHby2Qj6wZAA3YHeMlRmZNQTcb6VxctkGmM+mcM6ROQKvHpr7SS6EgdfEhH+s25LDshBjvPx/Ecm+bOVQ==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       readable-web-to-node-stream: 3.0.2
-      strtok3: 6.2.4
-      token-types: 4.1.1
+      strtok3: 7.0.0-alpha.8
+      token-types: 5.0.0-alpha.2
     dev: false
 
   /ieee754/1.2.1:
@@ -57,8 +57,8 @@ packages:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
     dev: false
 
-  /pdf-lib/1.17.0:
-    resolution: {integrity: sha512-INe7i0CatJR+YwizvldDeJgXF2jlBnhqpUbUeWGLr95SldYTO1j9mLg7IZwKHJ4FHi3E2VmM+jEVL+d2bExO0A==}
+  /pdf-lib/1.17.1:
+    resolution: {integrity: sha512-V/mpyJAoTsN4cnP31vc0wfNA1+p20evqqnap0KLoRUN0Yk/p3wN52DOEsL4oBFcLdb76hlpKPtzJIgo67j/XLw==}
     dependencies:
       '@pdf-lib/standard-fonts': 1.0.0
       '@pdf-lib/upng': 1.0.1
@@ -66,9 +66,9 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /peek-readable/4.0.1:
-    resolution: {integrity: sha512-7qmhptnR0WMSpxT5rMHG9bW/mYSR1uqaPFj2MHvT+y/aOUu6msJijpKt5SkTDKySwg65OWG2JwTMBlgcbwMHrQ==}
-    engines: {node: '>=8'}
+  /peek-readable/5.0.0-alpha.5:
+    resolution: {integrity: sha512-pJohF/tDwV3ntnT5+EkUo4E700q/j/OCDuPxtM+5/kFGjyOai/sK4/We4Cy1MB2OiTQliWU5DxPvYIKQAdPqAA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dev: false
 
   /readable-stream/3.6.0:
@@ -97,17 +97,17 @@ packages:
       safe-buffer: 5.2.1
     dev: false
 
-  /strtok3/6.2.4:
-    resolution: {integrity: sha512-GO8IcFF9GmFDvqduIspUBwCzCbqzegyVKIsSymcMgiZKeCfrN9SowtUoi8+b59WZMAjIzVZic/Ft97+pynR3Iw==}
-    engines: {node: '>=10'}
+  /strtok3/7.0.0-alpha.8:
+    resolution: {integrity: sha512-u+k19v+rTxBjGYxncRQjGvZYwYvEd0uP3D+uHKe/s4WB1eXS5ZwpZsTlBu5xSS4zEd89mTXECXg6WW3FSeV8cA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       '@tokenizer/token': 0.3.0
-      peek-readable: 4.0.1
+      peek-readable: 5.0.0-alpha.5
     dev: false
 
-  /token-types/4.1.1:
-    resolution: {integrity: sha512-hD+QyuUAyI2spzsI0B7gf/jJ2ggR4RjkAo37j3StuePhApJUwcWDjnHDOFdIWYSwNR28H14hpwm4EI+V1Ted1w==}
-    engines: {node: '>=10'}
+  /token-types/5.0.0-alpha.2:
+    resolution: {integrity: sha512-EsG9UxAW4M6VATrEEjhPFTKEUi1OiJqTUMIZOGBN49fGxYjZB36k0p7to3HZSmWRoHm1QfZgrg3e02fpqAt5fQ==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       '@tokenizer/token': 0.3.0
       ieee754: 1.2.1
@@ -117,8 +117,8 @@ packages:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: false
 
-  /typescript/4.4.4:
-    resolution: {integrity: sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==}
+  /typescript/4.5.5:
+    resolution: {integrity: sha512-TCTIul70LyWe6IJWT8QSYeA54WQe8EjQFU4wY52Fasj5UKx88LNYKCgBEHcOMOrFF1rKGbD8v/xcNWVUq9SymA==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
