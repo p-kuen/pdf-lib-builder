@@ -171,7 +171,7 @@ export class PDFDocumentBuilder {
     options = Object.assign(defaultOptions, options)
     options.maxWidth = Math.min(
       options.maxWidth || Infinity,
-      this.page.getWidth() - this.x - this.options.margins.right
+      this.page.getWidth() - (options.x || this.page.getX()) - this.options.margins.right
     )
 
     // handle position options
