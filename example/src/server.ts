@@ -11,6 +11,37 @@ createServer(async (req, res) => {
     margins: {top: 32, right: 25, left: 70, bottom: 50},
   })
 
+  // create top left margin lines
+  builder.line({
+    start: {x: builder.options.margins.left, y: builder.options.margins.top},
+    end: {x: builder.options.margins.left + 10, y: builder.options.margins.top},
+  })
+  builder.line({
+    start: {x: builder.options.margins.left, y: builder.options.margins.top},
+    end: {x: builder.options.margins.left, y: builder.options.margins.top + 10},
+  })
+
+  // create bottom right margin lines
+  builder.line({
+    start: {x: builder.maxX, y: builder.maxY},
+    end: {x: builder.maxX - 10, y: builder.maxY},
+  })
+  builder.line({
+    start: {x: builder.maxX, y: builder.maxY},
+    end: {x: builder.maxX, y: builder.maxY - 10},
+  })
+
+  builder.rect({
+    x: builder.options.margins.left,
+    y: builder.options.margins.top,
+    height: builder.lineHeight,
+    width: 10,
+    opacity: 0.2,
+    color: rgb(1, 0, 0),
+  })
+
+  builder.ellipse({x: builder.options.margins.left, y: builder.options.margins.top, xScale: 5, yScale: 5, opacity: 0.5})
+
   builder.text('This is a test document')
   builder.text('This should be rendered on next line.')
   builder.text('On this text \nwe \nfind \nnew \nlines')
