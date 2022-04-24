@@ -1,28 +1,6 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PDFDocumentBuilder = exports.rotatePoint = exports.RectangleAlignment = void 0;
-const pdf_lib_1 = require("pdf-lib");
-const fs_1 = require("fs");
-var RectangleAlignment;
+import { addRandomSuffix, breakTextIntoLines, cleanText, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, lineSplit, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, toRadians, radians, } from 'pdf-lib';
+import { readFileSync } from 'fs';
+export var RectangleAlignment;
 (function (RectangleAlignment) {
     RectangleAlignment[RectangleAlignment["TopLeft"] = 0] = "TopLeft";
     RectangleAlignment[RectangleAlignment["TopCenter"] = 1] = "TopCenter";
@@ -33,24 +11,30 @@ var RectangleAlignment;
     RectangleAlignment[RectangleAlignment["BottomLeft"] = 6] = "BottomLeft";
     RectangleAlignment[RectangleAlignment["BottomCenter"] = 7] = "BottomCenter";
     RectangleAlignment[RectangleAlignment["BottomRight"] = 8] = "BottomRight";
-})(RectangleAlignment = exports.RectangleAlignment || (exports.RectangleAlignment = {}));
-function rotatePoint(point, rotation) {
-    const rad = (0, pdf_lib_1.toRadians)(rotation);
+})(RectangleAlignment || (RectangleAlignment = {}));
+export function rotatePoint(point, rotation) {
+    const rad = toRadians(rotation);
     return {
         x: point.x * Math.cos(rad) - point.y * Math.sin(rad),
         y: point.x * Math.sin(rad) + point.y * Math.cos(rad),
     };
 }
-exports.rotatePoint = rotatePoint;
-class PDFDocumentBuilder {
+export class PDFDocumentBuilder {
+    doc;
+    page;
+    options;
+    font;
+    fontKey;
+    fontSize = 24;
+    fontColor = rgb(0, 0, 0);
+    /** The factor a line is larger than it's font size */
+    lineHeightFactor = 1.3;
+    pageIndex = 0;
+    contentStream;
+    contentStreamRef;
     constructor(doc, options) {
-        this.fontSize = 24;
-        this.fontColor = (0, pdf_lib_1.rgb)(0, 0, 0);
-        /** The factor a line is larger than it's font size */
-        this.lineHeightFactor = 1.3;
-        this.pageIndex = 0;
         this.doc = doc;
-        this.font = this.doc.embedStandardFont(pdf_lib_1.StandardFonts.Helvetica);
+        this.font = this.doc.embedStandardFont(StandardFonts.Helvetica);
         // If there is no page in the document, create one
         const pageCount = doc.getPageCount();
         if (pageCount === 0) {
@@ -70,12 +54,12 @@ class PDFDocumentBuilder {
     }
     setFont(font) {
         this.font = font;
-        this.fontKey = (0, pdf_lib_1.addRandomSuffix)(this.font.name);
-        this.page.node.setFontDictionary(pdf_lib_1.PDFName.of(this.fontKey), this.font.ref);
+        this.fontKey = addRandomSuffix(this.font.name);
+        this.page.node.setFontDictionary(PDFName.of(this.fontKey), this.font.ref);
     }
     getFont() {
         if (!this.font || !this.fontKey) {
-            const font = this.doc.embedStandardFont(pdf_lib_1.StandardFonts.Helvetica);
+            const font = this.doc.embedStandardFont(StandardFonts.Helvetica);
             this.setFont(font);
         }
         return [this.font, this.fontKey];
@@ -102,10 +86,10 @@ class PDFDocumentBuilder {
         let x = options.x || this.page.getX();
         // Handle alignment
         if (options.align) {
-            if (options.align === pdf_lib_1.TextAlignment.Center) {
+            if (options.align === TextAlignment.Center) {
                 x -= textWidth(text) / 2;
             }
-            else if (options.align === pdf_lib_1.TextAlignment.Right) {
+            else if (options.align === TextAlignment.Right) {
                 x -= textWidth(text);
             }
         }
@@ -117,8 +101,8 @@ class PDFDocumentBuilder {
         }
         const wordBreaks = options.wordBreaks || this.doc.defaultWordBreaks;
         const textLines = options.maxWidth === undefined
-            ? (0, pdf_lib_1.lineSplit)((0, pdf_lib_1.cleanText)(text))
-            : (0, pdf_lib_1.breakTextIntoLines)(text, wordBreaks, options.maxWidth, textWidth);
+            ? lineSplit(cleanText(text))
+            : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
         const encodedLines = [];
         let i = 0;
         for (const text of textLines) {
@@ -129,7 +113,7 @@ class PDFDocumentBuilder {
             // if this is a cut off line add an ellipsis
             if (i === (options?.maxLines || Infinity) - 1 && textLines.length > i + 1) {
                 const ellipsis = '…';
-                encodedLines.push(font.encodeText((0, pdf_lib_1.breakTextIntoLines)(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
+                encodedLines.push(font.encodeText(breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
             }
             else {
                 encodedLines.push(font.encodeText(text));
@@ -138,9 +122,9 @@ class PDFDocumentBuilder {
         }
         let contentStream = this.getContentStream();
         const color = options.color || this.fontColor;
-        const rotate = options.rotate || (0, pdf_lib_1.degrees)(0);
-        const xSkew = options.xSkew || (0, pdf_lib_1.degrees)(0);
-        const ySkew = options.ySkew || (0, pdf_lib_1.degrees)(0);
+        const rotate = options.rotate || degrees(0);
+        const xSkew = options.xSkew || degrees(0);
+        const ySkew = options.ySkew || degrees(0);
         const lineHeight = options.lineHeight || fontSize * this.lineHeightFactor;
         let graphicsStateKey = this.maybeEmbedGraphicsState({
             opacity: options.opacity,
@@ -165,15 +149,15 @@ class PDFDocumentBuilder {
             x = options.x || this.page.getX();
             // Handle alignment
             if (options.align) {
-                if (options.align === pdf_lib_1.TextAlignment.Center) {
+                if (options.align === TextAlignment.Center) {
                     x -= textWidth(textLines[i]) / 2;
                 }
-                else if (options.align === pdf_lib_1.TextAlignment.Right) {
+                else if (options.align === TextAlignment.Right) {
                     x -= textWidth(textLines[i]);
                 }
             }
             this.page.moveDown(fontSize);
-            const operators = (0, pdf_lib_1.drawText)(line, {
+            const operators = drawText(line, {
                 color,
                 font: fontKey,
                 size: fontSize,
@@ -209,8 +193,8 @@ class PDFDocumentBuilder {
             image = input;
         }
         else {
-            const fileContent = (0, fs_1.readFileSync)(input);
-            const { fileTypeFromBuffer } = await Promise.resolve().then(() => __importStar(require('file-type')));
+            const fileContent = readFileSync(input);
+            const { fileTypeFromBuffer } = await import('file-type');
             const fileType = await fileTypeFromBuffer(fileContent);
             if (!fileType) {
                 console.error(`File type of file ${input} could not be determined, using JPEG!`);
@@ -244,21 +228,21 @@ class PDFDocumentBuilder {
         if (this.y + (options?.height || image.height) > this.maxY) {
             this.nextPage();
         }
-        const xObjectKey = (0, pdf_lib_1.addRandomSuffix)('Image', 10);
-        this.page.node.setXObject(pdf_lib_1.PDFName.of(xObjectKey), image.ref);
+        const xObjectKey = addRandomSuffix('Image', 10);
+        this.page.node.setXObject(PDFName.of(xObjectKey), image.ref);
         const graphicsStateKey = this.maybeEmbedGraphicsState({
             opacity: options?.opacity,
             blendMode: options?.blendMode,
         });
         const contentStream = this.getContentStream();
-        contentStream.push(...(0, pdf_lib_1.drawImage)(xObjectKey, {
+        contentStream.push(...drawImage(xObjectKey, {
             x: options?.x ?? this.x,
             y: this.convertY(options?.y ?? this.y) - (options?.height || image.height),
             width: options?.width ?? image.size().width,
             height: options?.height ?? image.size().height,
-            rotate: options?.rotate ?? (0, pdf_lib_1.degrees)(0),
-            xSkew: options?.xSkew ?? (0, pdf_lib_1.degrees)(0),
-            ySkew: options?.ySkew ?? (0, pdf_lib_1.degrees)(0),
+            rotate: options?.rotate ?? degrees(0),
+            xSkew: options?.xSkew ?? degrees(0),
+            ySkew: options?.ySkew ?? degrees(0),
             graphicsState: graphicsStateKey,
         }));
         // if the image is in the text flow, move down to set position after the image
@@ -275,13 +259,13 @@ class PDFDocumentBuilder {
             blendMode: options.blendMode,
         });
         if (!options.color && !options.borderColor) {
-            options.color = (0, pdf_lib_1.rgb)(0, 0, 0);
+            options.color = rgb(0, 0, 0);
         }
         const width = options.width ?? 150;
         const height = options.height ?? 100;
         let x = options.x ?? this.x;
         let y = options.y ?? this.y;
-        const rotation = options.rotate ?? (0, pdf_lib_1.radians)(0);
+        const rotation = options.rotate ?? radians(0);
         if (options.align === RectangleAlignment.Center) {
             const rotationOffset = rotatePoint({ x: width / 2, y: height / 2 }, rotation);
             x -= rotationOffset.x;
@@ -290,14 +274,14 @@ class PDFDocumentBuilder {
         else if (options.align !== undefined) {
             throw new Error(`Unsupported alignment option ${options.align}`);
         }
-        contentStream.push(...(0, pdf_lib_1.drawRectangle)({
+        contentStream.push(...drawRectangle({
             x,
             y: this.convertY(y) - height,
             width: width,
             height: height,
             rotate: rotation,
-            xSkew: options.xSkew ?? (0, pdf_lib_1.degrees)(0),
-            ySkew: options.ySkew ?? (0, pdf_lib_1.degrees)(0),
+            xSkew: options.xSkew ?? degrees(0),
+            ySkew: options.ySkew ?? degrees(0),
             borderWidth: options.borderWidth ?? 0,
             color: options.color ?? undefined,
             borderColor: options.borderColor ?? undefined,
@@ -320,13 +304,13 @@ class PDFDocumentBuilder {
             blendMode: options?.blendMode,
         });
         const contentStream = this.getContentStream();
-        contentStream.push(...(0, pdf_lib_1.drawEllipse)({
+        contentStream.push(...drawEllipse({
             x: options?.x ?? this.x,
             y: this.convertY(options?.y ?? this.y),
             xScale: options?.xScale ?? 100,
             yScale: options?.yScale ?? 100,
             rotate: options?.rotate ?? undefined,
-            color: options?.color ?? (options?.borderColor ? undefined : (0, pdf_lib_1.rgb)(0, 0, 0)),
+            color: options?.color ?? (options?.borderColor ? undefined : rgb(0, 0, 0)),
             borderColor: options?.borderColor ?? undefined,
             borderWidth: options?.borderWidth ?? 0,
             borderDashArray: options?.borderDashArray ?? undefined,
@@ -341,7 +325,7 @@ class PDFDocumentBuilder {
             blendMode: options.blendMode,
         });
         const contentStream = this.getContentStream();
-        contentStream.push(...(0, pdf_lib_1.drawLine)({
+        contentStream.push(...drawLine({
             start: {
                 x: options.start.x,
                 y: this.convertY(options.start.y),
@@ -351,7 +335,7 @@ class PDFDocumentBuilder {
                 y: this.convertY(options.end.y),
             },
             thickness: options.thickness ?? 1,
-            color: options.color ?? (0, pdf_lib_1.rgb)(0, 0, 0),
+            color: options.color ?? rgb(0, 0, 0),
             dashArray: options.dashArray ?? undefined,
             dashPhase: options.dashPhase ?? undefined,
             lineCap: options.lineCap ?? undefined,
@@ -365,14 +349,14 @@ class PDFDocumentBuilder {
             blendMode: options.blendMode,
         });
         if (!options.color && !options.borderColor) {
-            options.borderColor = (0, pdf_lib_1.rgb)(0, 0, 0);
+            options.borderColor = rgb(0, 0, 0);
         }
         const contentStream = this.getContentStream();
-        contentStream.push(...(0, pdf_lib_1.drawSvgPath)(path, {
+        contentStream.push(...drawSvgPath(path, {
             x: options.x ?? this.x,
             y: this.convertY(options.y ?? this.y),
             scale: options.scale,
-            rotate: options.rotate ?? (0, pdf_lib_1.degrees)(0),
+            rotate: options.rotate ?? degrees(0),
             color: options.color ?? undefined,
             borderColor: options.borderColor ?? undefined,
             borderWidth: options.borderWidth ?? 0,
@@ -394,8 +378,8 @@ class PDFDocumentBuilder {
     hexColor(hex) {
         const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
-            ? (0, pdf_lib_1.rgb)(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
-            : (0, pdf_lib_1.rgb)(0, 0, 0);
+            ? rgb(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
+            : rgb(0, 0, 0);
     }
     switchToPage(index) {
         if (index === this.pageIndex) {
@@ -474,7 +458,7 @@ class PDFDocumentBuilder {
     }
     createContentStream(...operators) {
         const dict = this.doc.context.obj({});
-        const contentStream = pdf_lib_1.PDFContentStream.of(dict, operators);
+        const contentStream = PDFContentStream.of(dict, operators);
         return contentStream;
     }
     maybeEmbedGraphicsState(options) {
@@ -482,17 +466,16 @@ class PDFDocumentBuilder {
         if (opacity === undefined && borderOpacity === undefined && blendMode === undefined) {
             return undefined;
         }
-        const key = (0, pdf_lib_1.addRandomSuffix)('GS', 10);
+        const key = addRandomSuffix('GS', 10);
         const graphicsState = this.doc.context.obj({
             Type: 'ExtGState',
             ca: opacity,
             CA: borderOpacity,
             BM: blendMode,
         });
-        this.page.node.setExtGState(pdf_lib_1.PDFName.of(key), graphicsState);
+        this.page.node.setExtGState(PDFName.of(key), graphicsState);
         return key;
     }
 }
-exports.PDFDocumentBuilder = PDFDocumentBuilder;
-exports.default = PDFDocumentBuilder;
+export default PDFDocumentBuilder;
 //# sourceMappingURL=main.js.map

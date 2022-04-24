@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A builder based on pdf-lib",
   "main": "build/main.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "serve": "tsc-watch --onSuccess \"node build/server.js\""
