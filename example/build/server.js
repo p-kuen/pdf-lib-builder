@@ -1,13 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const http_1 = require("http");
-const pdf_lib_1 = require("pdf-lib");
-const undici_1 = require("undici");
-const pdf_lib_builder_1 = require("pdf-lib-builder");
+import { createServer } from 'http';
+import { PDFDocument, radians, rgb, StandardFonts, TextAlignment, degrees, degreesToRadians } from 'pdf-lib';
+import { request } from 'undici';
+import { PDFDocumentBuilder, RectangleAlignment } from 'pdf-lib-builder';
 const port = 4000;
-(0, http_1.createServer)(async (req, res) => {
-    const doc = await pdf_lib_1.PDFDocument.create();
-    const builder = new pdf_lib_builder_1.PDFDocumentBuilder(doc, {
+createServer(async (req, res) => {
+    const doc = await PDFDocument.create();
+    const builder = new PDFDocumentBuilder(doc, {
         margins: { top: 32, right: 25, left: 70, bottom: 50 },
     });
     // create top left margin lines
@@ -34,7 +32,7 @@ const port = 4000;
         height: builder.lineHeight,
         width: 10,
         opacity: 0.2,
-        color: (0, pdf_lib_1.rgb)(1, 0, 0),
+        color: rgb(1, 0, 0),
     });
     builder.ellipse({ x: builder.options.margins.left, y: builder.options.margins.top, xScale: 5, yScale: 5, opacity: 0.5 });
     builder.text('This is a test document');
@@ -44,12 +42,12 @@ const port = 4000;
     builder.text('There should be a space between last lines and this line.');
     builder.moveDown(4);
     builder.text('We skipped 4 lines now.');
-    const boldFont = doc.embedStandardFont(pdf_lib_1.StandardFonts.HelveticaBold);
+    const boldFont = doc.embedStandardFont(StandardFonts.HelveticaBold);
     builder.text('This text should be bold', { font: boldFont });
     builder.text('This should be big', { size: 48 });
     // jpg=ArrayBuffer
     const url = 'https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg';
-    const buffer = await (0, undici_1.request)(url).then((res) => res.body.arrayBuffer());
+    const buffer = await request(url).then((res) => res.body.arrayBuffer());
     const image = await doc.embedJpg(buffer);
     builder.image(image, { x: 10, y: 10, fit: { height: 100 }, opacity: 0.2 });
     builder.image(image, { fit: { height: 100 } });
@@ -79,34 +77,34 @@ const port = 4000;
     builder.line({
         start,
         end,
-        color: (0, pdf_lib_1.rgb)(1, 0, 0),
+        color: rgb(1, 0, 0),
         thickness: 2,
     });
     builder.line({
         start,
         end,
-        color: (0, pdf_lib_1.rgb)(1, 1, 1),
+        color: rgb(1, 1, 1),
     });
     const [font] = builder.getFont();
     const text = 'I am on the line';
-    const rotation = (0, pdf_lib_1.radians)(Math.atan2(100, 200));
+    const rotation = radians(Math.atan2(100, 200));
     builder.rect({
         x: (start.x + end.x) / 2,
         y: (start.y + end.y) / 2,
         width: font.widthOfTextAtSize(text, 8),
         height: font.heightAtSize(8),
-        color: (0, pdf_lib_1.rgb)(1, 1, 1),
+        color: rgb(1, 1, 1),
         opacity: 0.5,
         rotate: rotation,
-        align: pdf_lib_builder_1.RectangleAlignment.Center,
+        align: RectangleAlignment.Center,
     });
     builder.text(text, {
         x: (start.x + end.x) / 2,
         y: (start.y + end.y) / 2,
-        color: (0, pdf_lib_1.rgb)(1, 1, 1),
+        color: rgb(1, 1, 1),
         size: 8,
         rotate: rotation,
-        align: pdf_lib_1.TextAlignment.Center,
+        align: TextAlignment.Center,
     });
     builder.rect({
         width: 200,
@@ -118,16 +116,16 @@ const port = 4000;
         maxWidth: 200,
         x: builder.page.getWidth() - builder.options.margins.right - 200,
         y: builder.y,
-        color: (0, pdf_lib_1.rgb)(0.8, 0.8, 0.8),
+        color: rgb(0.8, 0.8, 0.8),
     });
     builder.moveDown(5);
     builder.text('This text should be aligned in the center', {
         x: builder.page.getWidth() / 2,
-        align: pdf_lib_1.TextAlignment.Center,
+        align: TextAlignment.Center,
     });
     builder.text('This text should be aligned at the right', {
         x: builder.maxX,
-        align: pdf_lib_1.TextAlignment.Right,
+        align: TextAlignment.Right,
     });
     builder.moveDown(1);
     builder.ellipse({ xScale: 10, yScale: 10 });
@@ -154,36 +152,36 @@ const port = 4000;
     builder.line({
         start: { x: x, y: y + size / 2 },
         end: { x: x + size, y: y + size / 2 },
-        color: (0, pdf_lib_1.rgb)(0, 0, 0),
+        color: rgb(0, 0, 0),
     });
     builder.line({
         start: { x: x + size / 2, y: y },
         end: { x: x + size / 2, y: y + size },
-        color: (0, pdf_lib_1.rgb)(0, 0, 0),
+        color: rgb(0, 0, 0),
     });
     // we will now draw a rectangle
     builder.rect({
         x: x + size / 2,
         y: y + size / 2,
-        align: pdf_lib_builder_1.RectangleAlignment.Center,
+        align: RectangleAlignment.Center,
         width: 30,
         height: 10,
-        color: (0, pdf_lib_1.rgb)(0, 0, 0),
+        color: rgb(0, 0, 0),
         opacity: 0.4,
     });
     const width = 30;
     const height = 10;
     const angle = 90;
-    const angleRad = (0, pdf_lib_1.degreesToRadians)(angle);
+    const angleRad = degreesToRadians(angle);
     builder.rect({
         x: x + size / 2,
         y: y + size / 2,
-        align: pdf_lib_builder_1.RectangleAlignment.Center,
+        align: RectangleAlignment.Center,
         width,
         height,
-        color: (0, pdf_lib_1.rgb)(1, 0, 0),
+        color: rgb(1, 0, 0),
         opacity: 0.4,
-        rotate: (0, pdf_lib_1.degrees)(angle),
+        rotate: degrees(angle),
     });
     builder.y += size;
     builder.moveDown(3);

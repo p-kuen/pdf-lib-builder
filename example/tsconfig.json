@@ -4,17 +4,12 @@
     "strictNullChecks": true, // enable strict null checks as a best practice
     "strict": true,
     "target": "esnext", // specify ECMAScript target version
-    "module": "commonjs",
+    "module": "es2020",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "declaration": true,
-    "typeRoots": ["./node_modules/@types", "./typings"],
     "esModuleInterop": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "outDir": "./build",
     "incremental": true
   },
-  "include": ["./src/", "./typings"],
-  "exclude": ["node_modules", ".logs", "upload"]
+  "include": ["./src/"]
 }
