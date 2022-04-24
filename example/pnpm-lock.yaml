@@ -2,14 +2,14 @@ lockfileVersion: 5.3
 
 specifiers:
   '@types/node': ^16.11.6
-  gibma: ^0.4.2
   pdf-lib-builder: link:..
   tsc-watch: ^4.5.0
   typescript: ^4.4.4
+  undici: ^5.0.0
 
 dependencies:
-  gibma: 0.4.2
   pdf-lib-builder: link:..
+  undici: 5.0.0
 
 devDependencies:
   '@types/node': 16.11.6
@@ -26,11 +26,6 @@ packages:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
     dev: true
-
-  /content-type/1.0.4:
-    resolution: {integrity: sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==}
-    engines: {node: '>= 0.6'}
-    dev: false
 
   /cross-spawn/7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
@@ -60,12 +55,6 @@ packages:
   /from/0.1.7:
     resolution: {integrity: sha1-g8YK/Fi5xWmXAH7Rp2izqzA6RP4=}
     dev: true
-
-  /gibma/0.4.2:
-    resolution: {integrity: sha512-azVMl3hb1gchrXq9AGDrmi5CjgtbjYA8hAdqUS/fmoMHpBk60VRqoft66TBBHXjWPqWzE+GsNON7Bmx7kLdo3Q==}
-    dependencies:
-      content-type: 1.0.4
-    dev: false
 
   /isexe/2.0.0:
     resolution: {integrity: sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=}
@@ -158,6 +147,11 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
+
+  /undici/5.0.0:
+    resolution: {integrity: sha512-VhUpiZ3No1DOPPQVQnsDZyfcbTTcHdcgWej1PdFnSvOeJmOVDgiOHkunJmBLfmjt4CqgPQddPVjSWW0dsTs5Yg==}
+    engines: {node: '>=12.18'}
+    dev: false
 
   /which/2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}

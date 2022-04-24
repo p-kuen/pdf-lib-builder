@@ -15,7 +15,7 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "gibma": "^0.4.2",
-    "pdf-lib-builder": "link:.."
+    "pdf-lib-builder": "link:..",
+    "undici": "^5.0.0"
   }
 }

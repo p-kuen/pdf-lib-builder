@@ -1,6 +1,6 @@
 import {createServer} from 'http'
 import {PDFDocument, radians, rgb, StandardFonts, TextAlignment, degrees, degreesToRadians} from 'pdf-lib'
-import {request} from 'gibma'
+import {request} from 'undici'
 import {PDFDocumentBuilder, RectangleAlignment} from 'pdf-lib-builder'
 
 const port = 4000
@@ -31,8 +31,8 @@ createServer(async (req, res) => {
   // jpg=ArrayBuffer
   const url = 'https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg'
 
-  const string = await request(url).then((res) => res.data)
-  const image = await doc.embedJpg(Buffer.from(string!))
+  const buffer = await request(url).then((res) => res.body.arrayBuffer())
+  const image = await doc.embedJpg(buffer)
 
   builder.image(image, {x: 10, y: 10, fit: {height: 100}, opacity: 0.2})
 
