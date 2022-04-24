@@ -158,7 +158,7 @@ createServer(async (req, res) => {
   })
 
   builder.text('This text should be aligned at the right', {
-    x: builder.page.getWidth() - builder.options.margins.right,
+    x: builder.maxX,
     align: TextAlignment.Right,
   })
 

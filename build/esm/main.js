@@ -70,19 +70,29 @@ export class PDFDocumentBuilder {
             maxWidth: Infinity,
         };
         options = Object.assign(defaultOptions, options);
-        options.maxWidth = Math.min(options.maxWidth || Infinity, this.page.getWidth() - (options.x || this.page.getX()) - this.options.margins.right);
+        const [originalFont] = this.getFont();
+        if (options.font)
+            this.setFont(options.font);
+        let [font, fontKey] = this.getFont();
+        const fontSize = options.size || this.fontSize;
+        const textWidth = (t) => font.widthOfTextAtSize(t, fontSize);
+        let x = options.x || this.page.getX();
+        // Handle alignment
+        if (options.align) {
+            if (options.align === TextAlignment.Center) {
+                x -= textWidth(text) / 2;
+            }
+            else if (options.align === TextAlignment.Right) {
+                x -= textWidth(text);
+            }
+        }
+        options.maxWidth = Math.min(options.maxWidth || Infinity, this.page.getWidth() - x - this.options.margins.right);
         // handle position options
         let originalY = this.y;
         if (options.y) {
             this.y = options.y;
         }
-        const [originalFont] = this.getFont();
-        if (options.font)
-            this.setFont(options.font);
-        let [font, fontKey] = this.getFont();
         const wordBreaks = options.wordBreaks || this.doc.defaultWordBreaks;
-        const fontSize = options.size || this.fontSize;
-        const textWidth = (t) => font.widthOfTextAtSize(t, fontSize);
         const textLines = options.maxWidth === undefined
             ? lineSplit(cleanText(text))
             : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
@@ -129,7 +139,7 @@ export class PDFDocumentBuilder {
                     blendMode: options.blendMode,
                 });
             }
-            let x = options.x || this.page.getX();
+            x = options.x || this.page.getX();
             // Handle alignment
             if (options.align) {
                 if (options.align === TextAlignment.Center) {

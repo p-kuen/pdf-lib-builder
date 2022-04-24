@@ -126,7 +126,7 @@ const port = 4000;
         align: pdf_lib_1.TextAlignment.Center,
     });
     builder.text('This text should be aligned at the right', {
-        x: builder.page.getWidth() - builder.options.margins.right,
+        x: builder.maxX,
         align: pdf_lib_1.TextAlignment.Right,
     });
     builder.moveDown(1);
