@@ -66,6 +66,12 @@ export declare class PDFDocumentBuilder {
     text(text: string, options?: PDFBuilderPageDrawTextOptions): void;
     image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<PDFImage>;
     rect(options: PDFBuilderPageDrawRectangleOptions): void;
+    /**
+     * Draw an ellipse on this page.
+     * [x] and [y] define the center of the ellipse
+     * [xScale] and [yScale] define the scale from center to the outside border
+     * @param options
+     */
     ellipse(options?: PDFPageDrawEllipseOptions): void;
     line(options: PDFPageDrawLineOptions): void;
     svgPath(path: string, options: PDFPageDrawSVGOptions): void;

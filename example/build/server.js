@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = require("http");
 const pdf_lib_1 = require("pdf-lib");
-const gibma_1 = require("gibma");
+const undici_1 = require("undici");
 const pdf_lib_builder_1 = require("pdf-lib-builder");
 const port = 4000;
 (0, http_1.createServer)(async (req, res) => {
@@ -10,6 +10,33 @@ const port = 4000;
     const builder = new pdf_lib_builder_1.PDFDocumentBuilder(doc, {
         margins: { top: 32, right: 25, left: 70, bottom: 50 },
     });
+    // create top left margin lines
+    builder.line({
+        start: { x: builder.options.margins.left, y: builder.options.margins.top },
+        end: { x: builder.options.margins.left + 10, y: builder.options.margins.top },
+    });
+    builder.line({
+        start: { x: builder.options.margins.left, y: builder.options.margins.top },
+        end: { x: builder.options.margins.left, y: builder.options.margins.top + 10 },
+    });
+    // create bottom right margin lines
+    builder.line({
+        start: { x: builder.maxX, y: builder.maxY },
+        end: { x: builder.maxX - 10, y: builder.maxY },
+    });
+    builder.line({
+        start: { x: builder.maxX, y: builder.maxY },
+        end: { x: builder.maxX, y: builder.maxY - 10 },
+    });
+    builder.rect({
+        x: builder.options.margins.left,
+        y: builder.options.margins.top,
+        height: builder.lineHeight,
+        width: 10,
+        opacity: 0.2,
+        color: (0, pdf_lib_1.rgb)(1, 0, 0),
+    });
+    builder.ellipse({ x: builder.options.margins.left, y: builder.options.margins.top, xScale: 5, yScale: 5, opacity: 0.5 });
     builder.text('This is a test document');
     builder.text('This should be rendered on next line.');
     builder.text('On this text \nwe \nfind \nnew \nlines');
@@ -22,8 +49,8 @@ const port = 4000;
     builder.text('This should be big', { size: 48 });
     // jpg=ArrayBuffer
     const url = 'https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg';
-    const string = await (0, gibma_1.request)(url).then((res) => res.data);
-    const image = await doc.embedJpg(Buffer.from(string));
+    const buffer = await (0, undici_1.request)(url).then((res) => res.body.arrayBuffer());
+    const image = await doc.embedJpg(buffer);
     builder.image(image, { x: 10, y: 10, fit: { height: 100 }, opacity: 0.2 });
     builder.image(image, { fit: { height: 100 } });
     builder.text('Image centered:');
@@ -61,7 +88,7 @@ const port = 4000;
         color: (0, pdf_lib_1.rgb)(1, 1, 1),
     });
     const [font] = builder.getFont();
-    let text = 'I am on the line';
+    const text = 'I am on the line';
     const rotation = (0, pdf_lib_1.radians)(Math.atan2(100, 200));
     builder.rect({
         x: (start.x + end.x) / 2,
@@ -160,15 +187,6 @@ const port = 4000;
     });
     builder.y += size;
     builder.moveDown(3);
-    const point = {
-        x: builder.x,
-        y: builder.y,
-    };
-    builder.line({ start: point, end: { x: point.x, y: point.y + 30 }, color: (0, pdf_lib_1.rgb)(1, 0, 0) });
-    // builder.ellipse({x: point.x, y: point.y, color: rgb(1, 0, 0), xScale: 10, yScale: 10})
-    text = (99999999999999).toFixed(2);
-    const textWidth = builder.font.widthOfTextAtSize(text, 12);
-    builder.text(text, { x: point.x - textWidth / 2, y: point.y, size: 12 });
     res.write(await doc.save({ useObjectStreams: true }));
     res.end();
 }).listen(port);
