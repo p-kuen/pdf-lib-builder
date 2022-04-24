@@ -416,6 +416,12 @@ export class PDFDocumentBuilder {
     )
   }
 
+  /**
+   * Draw an ellipse on this page.
+   * [x] and [y] define the center of the ellipse
+   * [xScale] and [yScale] define the scale from center to the outside border
+   * @param options
+   */
   ellipse(options?: PDFPageDrawEllipseOptions) {
     const graphicsStateKey = this.maybeEmbedGraphicsState({
       opacity: options?.opacity,
