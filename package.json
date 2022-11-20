@@ -12,6 +12,7 @@
   },
   "author": "Patrick Kuen <p.kuen@cloudacy.com>",
   "license": "ISC",
+  "repository": "p-kuen/pdf-lib-builder",
   "dependencies": {
     "file-type": "^18.0.0",
     "pdf-lib": "^1.17.1"
