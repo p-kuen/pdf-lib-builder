@@ -1,5 +1,4 @@
 import { addRandomSuffix, breakTextIntoLines, cleanText, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, lineSplit, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, toRadians, radians, } from 'pdf-lib';
-import { readFileSync } from 'fs';
 export var RectangleAlignment;
 (function (RectangleAlignment) {
     RectangleAlignment[RectangleAlignment["TopLeft"] = 0] = "TopLeft";
@@ -189,26 +188,25 @@ export class PDFDocumentBuilder {
     }
     async image(input, options) {
         let image;
-        if (typeof input !== 'string') {
-            image = input;
-        }
-        else {
-            const fileContent = readFileSync(input);
+        if (Buffer.isBuffer(input)) {
             const { fileTypeFromBuffer } = await import('file-type');
-            const fileType = await fileTypeFromBuffer(fileContent);
+            const fileType = await fileTypeFromBuffer(input);
             if (!fileType) {
                 console.error(`File type of file ${input} could not be determined, using JPEG!`);
-                image = await this.doc.embedJpg(fileContent);
+                image = await this.doc.embedJpg(input);
             }
             else if (fileType.mime === 'image/jpeg') {
-                image = await this.doc.embedJpg(fileContent);
+                image = await this.doc.embedJpg(input);
             }
             else if (fileType.mime === 'image/png') {
-                image = await this.doc.embedPng(fileContent);
+                image = await this.doc.embedPng(input);
             }
             else {
                 throw new Error(`File type ${fileType.mime} could not be used as an image!`);
             }
+        }
+        else {
+            image = input;
         }
         if (options?.onLoad !== undefined) {
             options.onLoad(image);

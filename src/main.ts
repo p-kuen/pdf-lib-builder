@@ -34,8 +34,6 @@ import {
   Rotation,
 } from 'pdf-lib'
 
-import {readFileSync} from 'fs'
-
 interface Margins {
   top: number
   bottom: number
@@ -305,26 +303,25 @@ export class PDFDocumentBuilder {
     if (options.font) this.setFont(originalFont)
   }
 
-  async image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions) {
+  async image(input: Buffer | PDFImage, options?: PDFBuilderPageDrawImageOptions) {
     let image: PDFImage
 
-    if (typeof input !== 'string') {
-      image = input
-    } else {
-      const fileContent = readFileSync(input)
+    if (Buffer.isBuffer(input)) {
       const {fileTypeFromBuffer} = await import('file-type')
-      const fileType = await fileTypeFromBuffer(fileContent)
+      const fileType = await fileTypeFromBuffer(input)
 
       if (!fileType) {
         console.error(`File type of file ${input} could not be determined, using JPEG!`)
-        image = await this.doc.embedJpg(fileContent)
+        image = await this.doc.embedJpg(input)
       } else if (fileType.mime === 'image/jpeg') {
-        image = await this.doc.embedJpg(fileContent)
+        image = await this.doc.embedJpg(input)
       } else if (fileType.mime === 'image/png') {
-        image = await this.doc.embedPng(fileContent)
+        image = await this.doc.embedPng(input)
       } else {
         throw new Error(`File type ${fileType.mime} could not be used as an image!`)
       }
+    } else {
+      image = input
     }
 
     if (options?.onLoad !== undefined) {
