@@ -184,9 +184,6 @@ createServer(async (req, res) => {
 
   builder.nextPage()
 
-  builder.x = builder.options.margins.left
-  builder.y = builder.options.margins.top
-
   // we will draw a coordinate system here
   const size = 300
   const x = builder.x

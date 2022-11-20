@@ -371,7 +371,7 @@ export class PDFDocumentBuilder {
      * Resets the position to the top left of the page.
      */
     resetPosition() {
-        this.moveTo(this.options.margins.left, this.options.margins.right);
+        this.moveTo(this.options.margins.left, this.options.margins.top);
     }
     hexColor(hex) {
         const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
