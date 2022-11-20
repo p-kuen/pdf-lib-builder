@@ -5,7 +5,7 @@
     "strict": true,
     "target": "esnext", // specify ECMAScript target version
     "module": "es2020",
-    "moduleResolution": "node",
+    "moduleResolution": "Node16",
     "noImplicitAny": true,
     "declaration": true,
     "allowSyntheticDefaultImports": false,
