@@ -11,7 +11,7 @@
     "test": "jasmine"
   },
   "author": "Patrick Kuen <p.kuen@cloudacy.com>",
-  "license": "ISC",
+  "license": "MIT",
   "repository": "p-kuen/pdf-lib-builder",
   "dependencies": {
     "file-type": "^18.0.0",
