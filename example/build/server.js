@@ -143,8 +143,6 @@ createServer(async (req, res) => {
     });
     builder.svgPath('M 10,10 L 10,20 L 20,10 L 10,10', { x: 10, y: 10 });
     builder.nextPage();
-    builder.x = builder.options.margins.left;
-    builder.y = builder.options.margins.top;
     // we will draw a coordinate system here
     const size = 300;
     const x = builder.x;
