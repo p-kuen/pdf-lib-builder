@@ -1,6 +1,6 @@
 {
   "name": "pdf-lib-builder",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A builder based on pdf-lib",
   "main": "build/main.js",
   "module": "build/main.js",
