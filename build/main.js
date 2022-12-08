@@ -188,7 +188,7 @@ export class PDFDocumentBuilder {
     }
     async image(input, options) {
         let image;
-        if (Buffer.isBuffer(input)) {
+        if (input instanceof ArrayBuffer || input instanceof Uint8Array) {
             const { fileTypeFromBuffer } = await import('file-type');
             const fileType = await fileTypeFromBuffer(input);
             if (!fileType) {

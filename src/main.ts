@@ -303,10 +303,10 @@ export class PDFDocumentBuilder {
     if (options.font) this.setFont(originalFont)
   }
 
-  async image(input: Buffer | PDFImage, options?: PDFBuilderPageDrawImageOptions) {
+  async image(input: Uint8Array | ArrayBuffer | PDFImage, options?: PDFBuilderPageDrawImageOptions) {
     let image: PDFImage
 
-    if (Buffer.isBuffer(input)) {
+    if (input instanceof ArrayBuffer || input instanceof Uint8Array) {
       const {fileTypeFromBuffer} = await import('file-type')
       const fileType = await fileTypeFromBuffer(input)
 

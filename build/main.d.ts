@@ -1,4 +1,3 @@
-/// <reference types="node" resolution-mode="require"/>
 import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment, Rotation } from 'pdf-lib';
 interface Margins {
     top: number;
@@ -65,7 +64,7 @@ export declare class PDFDocumentBuilder {
     setFontSize(size: number): void;
     setLineHeight(lineHeight: number): void;
     text(text: string, options?: PDFBuilderPageDrawTextOptions): void;
-    image(input: Buffer | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<PDFImage>;
+    image(input: Uint8Array | ArrayBuffer | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<PDFImage>;
     rect(options: PDFBuilderPageDrawRectangleOptions): void;
     /**
      * Draw an ellipse on this page.
