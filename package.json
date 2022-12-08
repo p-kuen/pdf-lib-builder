@@ -18,7 +18,7 @@
     "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
-    "@types/node": "^18.11.9",
-    "typescript": "^4.9.3"
+    "@types/node": "^18.11.11",
+    "typescript": "^4.9.4"
   }
 }
