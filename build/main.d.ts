@@ -64,6 +64,9 @@ export declare class PDFDocumentBuilder {
     setFontSize(size: number): void;
     setLineHeight(lineHeight: number): void;
     text(text: string, options?: PDFBuilderPageDrawTextOptions): void;
+    html(html: string): Promise<void>;
+    private renderHtmlDocument;
+    private renderHtmlNode;
     image(input: Uint8Array | ArrayBuffer | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<PDFImage>;
     rect(options: PDFBuilderPageDrawRectangleOptions): void;
     /**
@@ -98,6 +101,10 @@ export declare class PDFDocumentBuilder {
      * @returns calculated maximum x-value using the page width minus right margin
      */
     get maxX(): number;
+    /**
+     * @returns calculated maximum width using the current x-position and page width
+     */
+    get maxWidth(): number;
     /**
      * @returns calculated maximum y-value using the page height minus bottom margin
      */

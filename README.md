@@ -1,7 +1,6 @@
 # pdf-lib-builder
 
-This is an automatic page creation library for [pdf-lib](https://github.com/Hopding/pdf-lib).
-It is thought to be an alternative to [pdfkit](https://github.com/foliojs/pdfkit) for users that actually had to use both of the libraries (like me 😅).
+This is an automatic page creation library for [pdf-lib](https://github.com/Hopding/pdf-lib). It is thought to be an alternative to [pdfkit](https://github.com/foliojs/pdfkit) for users that actually had to use both of the libraries (like me 😅).
 
 ## Example
 
@@ -13,10 +12,10 @@ To start you simply create an instance of the document builder class and wrap th
 
 ```ts
 // First create a PDFDocument like you would usually do.
-const doc = await PDFDocument.create();
+const doc = await PDFDocument.create()
 
 // Now create a PDFDocumentBuilder instance and wrap the doc inside.
-const builder = new PDFDocumentBuilder(doc);
+const builder = new PDFDocumentBuilder(doc)
 ```
 
 Next you can use some functions to build up your document.
@@ -26,24 +25,41 @@ Next you can use some functions to build up your document.
 ### Create a text
 
 ```ts
-builder.text("Hello world.");
+builder.text('Hello world.')
 ```
 
 It automatically goes to the next line when writing a text. You can pass the default `pdf-lib`-options to the `text` function.
 
 ### Create an image
 
-To create an image pass an already embedded image (either [embedJpg](https://pdf-lib.js.org/docs/api/classes/pdfdocument#embedjpg) or [embedPng](https://pdf-lib.js.org/docs/api/classes/pdfdocument#embedpng)).
-Additional to the [default options](https://pdf-lib.js.org/docs/api/#const-drawimage) you can pass a `fit` option, which automatically fits the image in the given box.
+To create an image pass an already embedded image (either [embedJpg](https://pdf-lib.js.org/docs/api/classes/pdfdocument#embedjpg) or [embedPng](https://pdf-lib.js.org/docs/api/classes/pdfdocument#embedpng)). Additional to the [default options](https://pdf-lib.js.org/docs/api/#const-drawimage) you can pass a `fit` option, which automatically fits the image in the given box.
 
 ```ts
-builder.image(image);
+builder.image(image)
+```
+
+### Render HTML (preview)
+
+This package supports experimental HTML rendering using the document builder methods. Basically it always renders the text contained in the html. Additionally it currently supports rendering
+
+- Paragraphs
+- Headers
+- Images
+- Strong Tags
+- Colors in style attribute
+
+If a tag is not supported yet, it is just ignored by the library.
+
+To render html, simply run the following **async** method:
+
+```ts
+await builder.html(`<h1>This is a header</h1>`)
 ```
 
 ### Moving
 
 ```ts
-builder.moveDown(1);
+builder.moveDown(1)
 ```
 
 You can pass the amount of **lines** to move down. This is calculated by the current font size.
