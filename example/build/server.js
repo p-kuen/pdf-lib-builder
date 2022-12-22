@@ -8,6 +8,12 @@ const html = `
 <h2>My Second Heading</h2>
 <h3>My Third Heading</h3>
 <p>My first paragraph.</p>
+<p>
+  <ul>
+    <li>First bulletpoint</li>
+    <li>Second bulletpoint</li>
+  </ul>
+</p>
 `;
 createServer(async (req, res) => {
     const doc = await PDFDocument.create();

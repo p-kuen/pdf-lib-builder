@@ -1,4 +1,5 @@
 import { addRandomSuffix, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, toRadians, radians, decodeFromBase64DataUri, } from 'pdf-lib';
+import { isTag } from 'domhandler';
 import { breakTextIntoLines } from './utils/lines.js';
 import { hexColor } from './utils/color.js';
 export var RectangleAlignment;
@@ -205,6 +206,10 @@ export class PDFDocumentBuilder {
         const htmlText = await import('./html/text.js');
         const textStyle = Object.assign({}, options?.textStyle ?? {}, parent ? htmlText.getHtmlTextOptions(this, parent, options?.lastNode) : undefined);
         if (domhandler.isText(node)) {
+            // handle <li> tags
+            if (parent && isTag(parent) && parent.name === 'li') {
+                node.data = '- ' + node.data;
+            }
             this.text(node.data, textStyle);
         }
         else if (domhandler.isTag(node) && node.name === 'img') {

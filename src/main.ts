@@ -31,7 +31,7 @@ import {
   Rotation,
   decodeFromBase64DataUri,
 } from 'pdf-lib'
-import type {Node as HtmlNode, ParentNode as HtmlParentNode} from 'domhandler'
+import {isTag, Node as HtmlNode, ParentNode as HtmlParentNode} from 'domhandler'
 import {breakTextIntoLines} from './utils/lines.js'
 import {hexColor} from './utils/color.js'
 
@@ -339,6 +339,11 @@ export class PDFDocumentBuilder {
     )
 
     if (domhandler.isText(node)) {
+      // handle <li> tags
+      if (parent && isTag(parent) && parent.name === 'li') {
+        node.data = '- ' + node.data
+      }
+
       this.text(node.data, textStyle)
     } else if (domhandler.isTag(node) && node.name === 'img') {
       if (node.attribs.src?.match(/^data:.*;base64/)) {
