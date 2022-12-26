@@ -5,6 +5,25 @@ import {PDFDocumentBuilder, RectangleAlignment} from 'pdf-lib-builder'
 
 const port = 4000
 
+const html = `
+<h1>My First Heading</h1>
+<h2>My Second Heading</h2>
+<h3>My Third Heading</h3>
+<p>My first paragraph.</p>
+<p>
+  <ul>
+    <li>First bulletpoint</li>
+    <li>Second bulletpoint</li>
+  </ul>
+</p>
+<p>
+  <ol>
+    <li>First ordered</li>
+    <li>Second ordered</li>
+  </ol>
+</p>
+`
+
 createServer(async (req, res) => {
   const doc = await PDFDocument.create()
   const builder = new PDFDocumentBuilder(doc, {
@@ -226,6 +245,10 @@ createServer(async (req, res) => {
     opacity: 0.4,
     rotate: degrees(angle),
   })
+
+  builder.moveDown(10)
+
+  await builder.html(html)
 
   builder.y += size
   builder.moveDown(3)
