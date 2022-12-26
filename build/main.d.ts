@@ -67,6 +67,7 @@ export declare class PDFDocumentBuilder {
     html(html: string): Promise<void>;
     private renderHtmlDocument;
     private renderHtmlNode;
+    private renderHtmlTextNode;
     image(input: Uint8Array | ArrayBuffer | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<PDFImage>;
     rect(options: PDFBuilderPageDrawRectangleOptions): void;
     /**

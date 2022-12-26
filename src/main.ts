@@ -31,7 +31,7 @@ import {
   Rotation,
   decodeFromBase64DataUri,
 } from 'pdf-lib'
-import {isTag, Node as HtmlNode, ParentNode as HtmlParentNode} from 'domhandler'
+import {isTag, Node as HtmlNode, ParentNode as HtmlParentNode, Text} from 'domhandler'
 import {breakTextIntoLines} from './utils/lines.js'
 import {hexColor} from './utils/color.js'
 
@@ -311,8 +311,6 @@ export class PDFDocumentBuilder {
     const parser = await import('htmlparser2')
     const parsed = parser.parseDocument(html, {})
 
-    const domhandler = await import('domhandler')
-
     await this.renderHtmlDocument(parsed)
   }
 
@@ -321,13 +319,12 @@ export class PDFDocumentBuilder {
 
     let i = 0
     for (const child of doc.children) {
-      await this.renderHtmlNode(child, doc, {lastNode: ++i === doc.children.length, textStyle: options?.textStyle})
+      await this.renderHtmlNode(child, {lastNode: ++i === doc.children.length, textStyle: options?.textStyle})
     }
   }
 
   private async renderHtmlNode(
     node: HtmlNode,
-    parent?: HtmlParentNode,
     options?: {lastNode?: boolean; textStyle?: PDFBuilderPageDrawTextOptions}
   ) {
     const domhandler = await import('domhandler')
@@ -335,16 +332,11 @@ export class PDFDocumentBuilder {
     const textStyle = Object.assign(
       {},
       options?.textStyle ?? {},
-      parent ? htmlText.getHtmlTextOptions(this, parent, options?.lastNode) : undefined
+      node.parent ? htmlText.getHtmlTextOptions(this, node.parent, options?.lastNode) : undefined
     )
 
     if (domhandler.isText(node)) {
-      // handle <li> tags
-      if (parent && isTag(parent) && parent.name === 'li') {
-        node.data = '- ' + node.data
-      }
-
-      this.text(node.data, textStyle)
+      this.renderHtmlTextNode(node, textStyle)
     } else if (domhandler.isTag(node) && node.name === 'img') {
       if (node.attribs.src?.match(/^data:.*;base64/)) {
         await this.image(decodeFromBase64DataUri(node.attribs.src))
@@ -354,6 +346,25 @@ export class PDFDocumentBuilder {
     if (domhandler.hasChildren(node)) {
       await this.renderHtmlDocument(node, {...options, textStyle})
     }
+  }
+
+  private async renderHtmlTextNode(node: Text, options?: PDFBuilderPageDrawTextOptions) {
+    // handle <li> tags
+    if (node.parent && isTag(node.parent) && node.parent.name === 'li') {
+      const grandParent = node.parent.parent
+
+      if (grandParent && isTag(grandParent)) {
+        if (grandParent.name === 'ul') {
+          node.data = '- ' + node.data
+        } else if (grandParent.name === 'ol') {
+          grandParent.attribs.count ??= '0'
+          grandParent.attribs.count = (Number(grandParent.attribs.count) + 1).toString()
+          node.data = `${grandParent.attribs.count}. ${node.data}`
+        }
+      }
+    }
+
+    this.text(node.data, options)
   }
 
   async image(input: Uint8Array | ArrayBuffer | PDFImage, options?: PDFBuilderPageDrawImageOptions) {

@@ -191,26 +191,21 @@ export class PDFDocumentBuilder {
     async html(html) {
         const parser = await import('htmlparser2');
         const parsed = parser.parseDocument(html, {});
-        const domhandler = await import('domhandler');
         await this.renderHtmlDocument(parsed);
     }
     async renderHtmlDocument(doc, options) {
         const domhandler = await import('domhandler');
         let i = 0;
         for (const child of doc.children) {
-            await this.renderHtmlNode(child, doc, { lastNode: ++i === doc.children.length, textStyle: options?.textStyle });
+            await this.renderHtmlNode(child, { lastNode: ++i === doc.children.length, textStyle: options?.textStyle });
         }
     }
-    async renderHtmlNode(node, parent, options) {
+    async renderHtmlNode(node, options) {
         const domhandler = await import('domhandler');
         const htmlText = await import('./html/text.js');
-        const textStyle = Object.assign({}, options?.textStyle ?? {}, parent ? htmlText.getHtmlTextOptions(this, parent, options?.lastNode) : undefined);
+        const textStyle = Object.assign({}, options?.textStyle ?? {}, node.parent ? htmlText.getHtmlTextOptions(this, node.parent, options?.lastNode) : undefined);
         if (domhandler.isText(node)) {
-            // handle <li> tags
-            if (parent && isTag(parent) && parent.name === 'li') {
-                node.data = '- ' + node.data;
-            }
-            this.text(node.data, textStyle);
+            this.renderHtmlTextNode(node, textStyle);
         }
         else if (domhandler.isTag(node) && node.name === 'img') {
             if (node.attribs.src?.match(/^data:.*;base64/)) {
@@ -220,6 +215,23 @@ export class PDFDocumentBuilder {
         if (domhandler.hasChildren(node)) {
             await this.renderHtmlDocument(node, { ...options, textStyle });
         }
+    }
+    async renderHtmlTextNode(node, options) {
+        // handle <li> tags
+        if (node.parent && isTag(node.parent) && node.parent.name === 'li') {
+            const grandParent = node.parent.parent;
+            if (grandParent && isTag(grandParent)) {
+                if (grandParent.name === 'ul') {
+                    node.data = '- ' + node.data;
+                }
+                else if (grandParent.name === 'ol') {
+                    grandParent.attribs.count ??= '0';
+                    grandParent.attribs.count = (Number(grandParent.attribs.count) + 1).toString();
+                    node.data = `${grandParent.attribs.count}. ${node.data}`;
+                }
+            }
+        }
+        this.text(node.data, options);
     }
     async image(input, options) {
         let image;

@@ -16,6 +16,12 @@ const html = `
     <li>Second bulletpoint</li>
   </ul>
 </p>
+<p>
+  <ol>
+    <li>First ordered</li>
+    <li>Second ordered</li>
+  </ol>
+</p>
 `
 
 createServer(async (req, res) => {
