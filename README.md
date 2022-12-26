@@ -45,6 +45,7 @@ This package supports experimental HTML rendering using the document builder met
 - Paragraphs
 - Headers
 - Images
+- Lists (ordered and unordered)
 - Strong Tags
 - Colors in style attribute
 
