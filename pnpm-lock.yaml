@@ -1,16 +1,16 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@types/node': ^18.11.11
+  '@types/node': ^18.11.18
   domhandler: ^5.0.3
-  file-type: ^18.0.0
+  file-type: ^18.2.0
   htmlparser2: ^8.0.1
   pdf-lib: ^1.17.1
-  typescript: ^4.9.4
+  typescript: ^4.9.5
 
 dependencies:
   domhandler: 5.0.3
-  file-type: 18.0.0
+  file-type: 18.2.0
   htmlparser2: 8.0.1
   pdf-lib: 1.17.1
 
@@ -72,8 +72,8 @@ packages:
     engines: {node: '>=0.12'}
     dev: false
 
-  /file-type/18.0.0:
-    resolution: {integrity: sha512-jjMwFpnW8PKofLE/4ohlhqwDk5k0NC6iy0UHAJFKoY1fQeGMN0GDdLgHQrvCbSpMwbqzoCZhRI5dETCZna5qVA==}
+  /file-type/18.2.0:
+    resolution: {integrity: sha512-M3RQMWY3F2ykyWZ+IHwNCjpnUmukYhtdkGGC1ZVEUb0ve5REGF7NNJ4Q9ehCUabtQKtSVFOMbFTXgJlFb0DQIg==}
     engines: {node: '>=14.16'}
     dependencies:
       readable-web-to-node-stream: 3.0.2
