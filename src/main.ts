@@ -163,6 +163,14 @@ export class PDFDocumentBuilder {
     this.page.setLineHeight(lineHeight)
   }
 
+  /**
+   * Draw one or more lines of text on this page
+   * Origin for position is the top left of the text depending on TextAlignment.
+   * Origin for rotation is the bottom left of the text depending on TextAlignment.
+   * @see drawText
+   * @param text
+   * @param options
+   */
   text(text: string, options?: PDFBuilderPageDrawTextOptions) {
     const defaultOptions: PDFBuilderPageDrawTextOptions = {
       maxWidth: Infinity,
