@@ -1,5 +1,7 @@
-import { addRandomSuffix, breakTextIntoLines, cleanText, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, lineSplit, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, toRadians, radians, } from 'pdf-lib';
-import { readFileSync } from 'fs';
+import { addRandomSuffix, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, toRadians, radians, decodeFromBase64DataUri, } from 'pdf-lib';
+import { isTag } from 'domhandler';
+import { breakTextIntoLines } from './utils/lines.js';
+import { hexColor } from './utils/color.js';
 export var RectangleAlignment;
 (function (RectangleAlignment) {
     RectangleAlignment[RectangleAlignment["TopLeft"] = 0] = "TopLeft";
@@ -93,16 +95,14 @@ export class PDFDocumentBuilder {
                 x -= textWidth(text);
             }
         }
-        options.maxWidth = Math.min(options.maxWidth || Infinity, this.page.getWidth() - x - this.options.margins.right);
+        const maxWidth = Math.min(options.maxWidth || Infinity, this.page.getWidth() - x - this.options.margins.right);
         // handle position options
         let originalY = this.y;
         if (options.y) {
             this.y = options.y;
         }
         const wordBreaks = options.wordBreaks || this.doc.defaultWordBreaks;
-        const textLines = options.maxWidth === undefined
-            ? lineSplit(cleanText(text))
-            : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
+        const textLines = breakTextIntoLines(text, wordBreaks, (l) => (l === 1 ? maxWidth : options?.maxWidth ?? this.maxX - this.options.margins.left), textWidth);
         const encodedLines = [];
         let i = 0;
         for (const text of textLines) {
@@ -113,7 +113,7 @@ export class PDFDocumentBuilder {
             // if this is a cut off line add an ellipsis
             if (i === (options?.maxLines || Infinity) - 1 && textLines.length > i + 1) {
                 const ellipsis = '…';
-                encodedLines.push(font.encodeText(breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
+                encodedLines.push(font.encodeText(breakTextIntoLines(text, wordBreaks, (l) => maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
             }
             else {
                 encodedLines.push(font.encodeText(text));
@@ -171,6 +171,7 @@ export class PDFDocumentBuilder {
             // Move down the difference of lineHeight and font size to create a gap **after** the text
             if (options.lineBreak !== false || !isLastLine) {
                 this.page.moveDown(lineHeight - fontSize);
+                this.x = this.options.margins.left;
             }
             else {
                 this.page.moveUp(fontSize);
@@ -187,28 +188,72 @@ export class PDFDocumentBuilder {
         if (options.font)
             this.setFont(originalFont);
     }
+    async html(html) {
+        const parser = await import('htmlparser2');
+        const parsed = parser.parseDocument(html, {});
+        await this.renderHtmlDocument(parsed);
+    }
+    async renderHtmlDocument(doc, options) {
+        const domhandler = await import('domhandler');
+        let i = 0;
+        for (const child of doc.children) {
+            await this.renderHtmlNode(child, { lastNode: ++i === doc.children.length, textStyle: options?.textStyle });
+        }
+    }
+    async renderHtmlNode(node, options) {
+        const domhandler = await import('domhandler');
+        const htmlText = await import('./html/text.js');
+        const textStyle = Object.assign({}, options?.textStyle ?? {}, node.parent ? htmlText.getHtmlTextOptions(this, node.parent, options?.lastNode) : undefined);
+        if (domhandler.isText(node)) {
+            this.renderHtmlTextNode(node, textStyle);
+        }
+        else if (domhandler.isTag(node) && node.name === 'img') {
+            if (node.attribs.src?.match(/^data:.*;base64/)) {
+                await this.image(decodeFromBase64DataUri(node.attribs.src));
+            }
+        }
+        if (domhandler.hasChildren(node)) {
+            await this.renderHtmlDocument(node, { ...options, textStyle });
+        }
+    }
+    async renderHtmlTextNode(node, options) {
+        // handle <li> tags
+        if (node.parent && isTag(node.parent) && node.parent.name === 'li') {
+            const grandParent = node.parent.parent;
+            if (grandParent && isTag(grandParent)) {
+                if (grandParent.name === 'ul') {
+                    node.data = '- ' + node.data;
+                }
+                else if (grandParent.name === 'ol') {
+                    grandParent.attribs.count ??= '0';
+                    grandParent.attribs.count = (Number(grandParent.attribs.count) + 1).toString();
+                    node.data = `${grandParent.attribs.count}. ${node.data}`;
+                }
+            }
+        }
+        this.text(node.data, options);
+    }
     async image(input, options) {
         let image;
-        if (typeof input !== 'string') {
-            image = input;
-        }
-        else {
-            const fileContent = readFileSync(input);
+        if (input instanceof ArrayBuffer || input instanceof Uint8Array) {
             const { fileTypeFromBuffer } = await import('file-type');
-            const fileType = await fileTypeFromBuffer(fileContent);
+            const fileType = await fileTypeFromBuffer(input);
             if (!fileType) {
-                console.error(`File type of file ${input} could not be determined, using JPEG!`);
-                image = await this.doc.embedJpg(fileContent);
+                console.error(`File type of buffer with length ${input.byteLength} could not be determined, using JPEG!`);
+                image = await this.doc.embedJpg(input);
             }
             else if (fileType.mime === 'image/jpeg') {
-                image = await this.doc.embedJpg(fileContent);
+                image = await this.doc.embedJpg(input);
             }
             else if (fileType.mime === 'image/png') {
-                image = await this.doc.embedPng(fileContent);
+                image = await this.doc.embedPng(input);
             }
             else {
                 throw new Error(`File type ${fileType.mime} could not be used as an image!`);
             }
+        }
+        else {
+            image = input;
         }
         if (options?.onLoad !== undefined) {
             options.onLoad(image);
@@ -373,13 +418,10 @@ export class PDFDocumentBuilder {
      * Resets the position to the top left of the page.
      */
     resetPosition() {
-        this.moveTo(this.options.margins.left, this.options.margins.right);
+        this.moveTo(this.options.margins.left, this.options.margins.top);
     }
     hexColor(hex) {
-        const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result
-            ? rgb(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
-            : rgb(0, 0, 0);
+        return hexColor(hex);
     }
     switchToPage(index) {
         if (index === this.pageIndex) {
@@ -441,6 +483,12 @@ export class PDFDocumentBuilder {
      */
     get maxX() {
         return this.page.getWidth() - this.options.margins.right;
+    }
+    /**
+     * @returns calculated maximum width using the current x-position and page width
+     */
+    get maxWidth() {
+        return this.maxX - this.x;
     }
     /**
      * @returns calculated maximum y-value using the page height minus bottom margin

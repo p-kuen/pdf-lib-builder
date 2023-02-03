@@ -1,8 +1,6 @@
 import {
   addRandomSuffix,
   BlendMode,
-  breakTextIntoLines,
-  cleanText,
   Color,
   degrees,
   drawEllipse,
@@ -11,7 +9,6 @@ import {
   drawRectangle,
   drawSvgPath,
   drawText,
-  lineSplit,
   PDFContentStream,
   PDFDocument,
   PDFFont,
@@ -32,9 +29,11 @@ import {
   toRadians,
   radians,
   Rotation,
+  decodeFromBase64DataUri,
 } from 'pdf-lib'
-
-import {readFileSync} from 'fs'
+import {isTag, Node as HtmlNode, ParentNode as HtmlParentNode, Text} from 'domhandler'
+import {breakTextIntoLines} from './utils/lines.js'
+import {hexColor} from './utils/color.js'
 
 interface Margins {
   top: number
@@ -188,7 +187,7 @@ export class PDFDocumentBuilder {
       }
     }
 
-    options.maxWidth = Math.min(options.maxWidth || Infinity, this.page.getWidth() - x - this.options.margins.right)
+    const maxWidth = Math.min(options.maxWidth || Infinity, this.page.getWidth() - x - this.options.margins.right)
 
     // handle position options
     let originalY = this.y
@@ -197,10 +196,12 @@ export class PDFDocumentBuilder {
     }
 
     const wordBreaks = options.wordBreaks || this.doc.defaultWordBreaks
-    const textLines =
-      options.maxWidth === undefined
-        ? lineSplit(cleanText(text))
-        : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth)
+    const textLines = breakTextIntoLines(
+      text,
+      wordBreaks,
+      (l) => (l === 1 ? maxWidth : options?.maxWidth ?? this.maxX - this.options.margins.left),
+      textWidth
+    )
 
     const encodedLines = []
 
@@ -216,7 +217,7 @@ export class PDFDocumentBuilder {
         const ellipsis = '…'
         encodedLines.push(
           font.encodeText(
-            breakTextIntoLines(text, wordBreaks, options.maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis
+            breakTextIntoLines(text, wordBreaks, (l) => maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis
           )
         )
       } else {
@@ -286,6 +287,7 @@ export class PDFDocumentBuilder {
       // Move down the difference of lineHeight and font size to create a gap **after** the text
       if (options.lineBreak !== false || !isLastLine) {
         this.page.moveDown(lineHeight - fontSize)
+        this.x = this.options.margins.left
       } else {
         this.page.moveUp(fontSize)
 
@@ -305,26 +307,85 @@ export class PDFDocumentBuilder {
     if (options.font) this.setFont(originalFont)
   }
 
-  async image(input: string | PDFImage, options?: PDFBuilderPageDrawImageOptions) {
+  async html(html: string) {
+    const parser = await import('htmlparser2')
+    const parsed = parser.parseDocument(html, {})
+
+    await this.renderHtmlDocument(parsed)
+  }
+
+  private async renderHtmlDocument(doc: HtmlParentNode, options?: {textStyle?: PDFBuilderPageDrawTextOptions}) {
+    const domhandler = await import('domhandler')
+
+    let i = 0
+    for (const child of doc.children) {
+      await this.renderHtmlNode(child, {lastNode: ++i === doc.children.length, textStyle: options?.textStyle})
+    }
+  }
+
+  private async renderHtmlNode(
+    node: HtmlNode,
+    options?: {lastNode?: boolean; textStyle?: PDFBuilderPageDrawTextOptions}
+  ) {
+    const domhandler = await import('domhandler')
+    const htmlText = await import('./html/text.js')
+    const textStyle = Object.assign(
+      {},
+      options?.textStyle ?? {},
+      node.parent ? htmlText.getHtmlTextOptions(this, node.parent, options?.lastNode) : undefined
+    )
+
+    if (domhandler.isText(node)) {
+      this.renderHtmlTextNode(node, textStyle)
+    } else if (domhandler.isTag(node) && node.name === 'img') {
+      if (node.attribs.src?.match(/^data:.*;base64/)) {
+        await this.image(decodeFromBase64DataUri(node.attribs.src))
+      }
+    }
+
+    if (domhandler.hasChildren(node)) {
+      await this.renderHtmlDocument(node, {...options, textStyle})
+    }
+  }
+
+  private async renderHtmlTextNode(node: Text, options?: PDFBuilderPageDrawTextOptions) {
+    // handle <li> tags
+    if (node.parent && isTag(node.parent) && node.parent.name === 'li') {
+      const grandParent = node.parent.parent
+
+      if (grandParent && isTag(grandParent)) {
+        if (grandParent.name === 'ul') {
+          node.data = '- ' + node.data
+        } else if (grandParent.name === 'ol') {
+          grandParent.attribs.count ??= '0'
+          grandParent.attribs.count = (Number(grandParent.attribs.count) + 1).toString()
+          node.data = `${grandParent.attribs.count}. ${node.data}`
+        }
+      }
+    }
+
+    this.text(node.data, options)
+  }
+
+  async image(input: Uint8Array | ArrayBuffer | PDFImage, options?: PDFBuilderPageDrawImageOptions) {
     let image: PDFImage
 
-    if (typeof input !== 'string') {
-      image = input
-    } else {
-      const fileContent = readFileSync(input)
+    if (input instanceof ArrayBuffer || input instanceof Uint8Array) {
       const {fileTypeFromBuffer} = await import('file-type')
-      const fileType = await fileTypeFromBuffer(fileContent)
+      const fileType = await fileTypeFromBuffer(input)
 
       if (!fileType) {
-        console.error(`File type of file ${input} could not be determined, using JPEG!`)
-        image = await this.doc.embedJpg(fileContent)
+        console.error(`File type of buffer with length ${input.byteLength} could not be determined, using JPEG!`)
+        image = await this.doc.embedJpg(input)
       } else if (fileType.mime === 'image/jpeg') {
-        image = await this.doc.embedJpg(fileContent)
+        image = await this.doc.embedJpg(input)
       } else if (fileType.mime === 'image/png') {
-        image = await this.doc.embedPng(fileContent)
+        image = await this.doc.embedPng(input)
       } else {
         throw new Error(`File type ${fileType.mime} could not be used as an image!`)
       }
+    } else {
+      image = input
     }
 
     if (options?.onLoad !== undefined) {
@@ -522,14 +583,11 @@ export class PDFDocumentBuilder {
    * Resets the position to the top left of the page.
    */
   resetPosition() {
-    this.moveTo(this.options.margins.left, this.options.margins.right)
+    this.moveTo(this.options.margins.left, this.options.margins.top)
   }
 
   hexColor(hex: string) {
-    const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    return result
-      ? rgb(parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255, parseInt(result[4], 16) / 255)
-      : rgb(0, 0, 0)
+    return hexColor(hex)
   }
 
   switchToPage(index: number) {
@@ -606,6 +664,13 @@ export class PDFDocumentBuilder {
    */
   get maxX() {
     return this.page.getWidth() - this.options.margins.right
+  }
+
+  /**
+   * @returns calculated maximum width using the current x-position and page width
+   */
+  get maxWidth() {
+    return this.maxX - this.x
   }
 
   /**
