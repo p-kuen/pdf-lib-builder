@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@types/node': ^18.11.18
+  '@types/node': ^18.13.0
   domhandler: ^5.0.3
   file-type: ^18.2.0
   htmlparser2: ^8.0.1
@@ -15,7 +15,7 @@ dependencies:
   pdf-lib: 1.17.1
 
 devDependencies:
-  '@types/node': 18.11.18
+  '@types/node': 18.13.0
   typescript: 4.9.5
 
 packages:
@@ -36,8 +36,8 @@ packages:
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
     dev: false
 
-  /@types/node/18.11.18:
-    resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==}
+  /@types/node/18.13.0:
+    resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==}
     dev: true
 
   /dom-serializer/2.0.0:
