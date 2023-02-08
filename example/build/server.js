@@ -155,9 +155,9 @@ createServer(async (req, res) => {
         height: font.heightAtSize(builder.fontSize) + 6,
         opacity: 0.3,
     });
-    builder.text('This text is cut off at half of the page because there maxLines is set to 1', {
+    builder.text('This text is cut off at half of the page because maxLines is set to 2', {
         maxWidth: builder.page.getWidth() / 2 - builder.options.margins.left,
-        maxLines: 1,
+        maxLines: 2,
     });
     builder.svgPath('M 10,10 L 10,20 L 20,10 L 10,10', { x: 10, y: 10 });
     builder.nextPage();
