@@ -63,6 +63,14 @@ export declare class PDFDocumentBuilder {
     getFont(): [PDFFont, string];
     setFontSize(size: number): void;
     setLineHeight(lineHeight: number): void;
+    /**
+     * Draw one or more lines of text on this page
+     * Origin for position is the top left of the text depending on TextAlignment.
+     * Origin for rotation is the bottom left of the text depending on TextAlignment.
+     * @see drawText
+     * @param text
+     * @param options
+     */
     text(text: string, options?: PDFBuilderPageDrawTextOptions): void;
     html(html: string): Promise<void>;
     private renderHtmlDocument;

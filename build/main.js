@@ -74,6 +74,14 @@ export class PDFDocumentBuilder {
         this.lineHeightFactor = lineHeight / this.fontSize;
         this.page.setLineHeight(lineHeight);
     }
+    /**
+     * Draw one or more lines of text on this page
+     * Origin for position is the top left of the text depending on TextAlignment.
+     * Origin for rotation is the bottom left of the text depending on TextAlignment.
+     * @see drawText
+     * @param text
+     * @param options
+     */
     text(text, options) {
         const defaultOptions = {
             maxWidth: Infinity,
@@ -85,6 +93,7 @@ export class PDFDocumentBuilder {
         let [font, fontKey] = this.getFont();
         const fontSize = options.size || this.fontSize;
         const textWidth = (t) => font.widthOfTextAtSize(t, fontSize);
+        const textStartPosition = options.x || this.page.getX();
         let x = options.x || this.page.getX();
         // Handle alignment
         if (options.align) {
@@ -146,7 +155,7 @@ export class PDFDocumentBuilder {
                     blendMode: options.blendMode,
                 });
             }
-            x = options.x || this.page.getX();
+            x = textStartPosition;
             // Handle alignment
             if (options.align) {
                 if (options.align === TextAlignment.Center) {

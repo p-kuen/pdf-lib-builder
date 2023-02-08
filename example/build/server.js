@@ -155,9 +155,18 @@ createServer(async (req, res) => {
         height: font.heightAtSize(builder.fontSize) + 6,
         opacity: 0.3,
     });
-    builder.text('This text is cut off at half of the page because maxLines is set to 2', {
-        maxWidth: builder.page.getWidth() / 2 - builder.options.margins.left,
+    const halfY = builder.y;
+    builder.text('This_text_is_cut_off_at_half_of_the_page_because_maxLines_is_set_to_2', {
+        maxWidth: builder.page.getWidth() / 2 - builder.options.margins.left - builder.options.margins.right,
         maxLines: 2,
+        wordBreaks: [' ', '_'],
+    });
+    builder.x = builder.page.getWidth() / 2;
+    builder.y = halfY;
+    builder.text('This_text_is_cut_off_at_the_other_half_of_the_page_because_maxLines_is_set_to_2', {
+        maxWidth: builder.page.getWidth() / 2 - builder.options.margins.left - builder.options.margins.right,
+        maxLines: 2,
+        wordBreaks: [' ', '_'],
     });
     builder.svgPath('M 10,10 L 10,20 L 20,10 L 10,10', { x: 10, y: 10 });
     builder.nextPage();
