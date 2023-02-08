@@ -184,6 +184,7 @@ export class PDFDocumentBuilder {
     const fontSize = options.size || this.fontSize
     const textWidth = (t: string) => font.widthOfTextAtSize(t, fontSize)
 
+    const textStartPosition = options.x || this.page.getX()
     let x = options.x || this.page.getX()
 
     // Handle alignment
@@ -267,7 +268,7 @@ export class PDFDocumentBuilder {
         })
       }
 
-      x = options.x || this.page.getX()
+      x = textStartPosition
 
       // Handle alignment
       if (options.align) {
