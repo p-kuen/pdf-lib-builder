@@ -1,5 +1,16 @@
 import {PDFBuilderPageDrawTextOptions} from '../main.js'
 import {fromRgbString, hexColor} from '../utils/color.js'
+import {isTag, Node} from 'domhandler'
+
+export enum ListStyleType {
+  None,
+  Disc,
+  Decimal,
+}
+
+export type StyleOptions = {
+  listStyleType?: ListStyleType
+}
 
 export function parseCssStyles(style: string) {
   const rules = style.split(';')
@@ -26,4 +37,16 @@ export function parseCssStyles(style: string) {
   }
 
   return textStyle
+}
+
+export function getNodeStyle(node: Node): StyleOptions | undefined {
+  if (!isTag(node)) {
+    return
+  }
+
+  if (node.name === 'ol') {
+    return {listStyleType: ListStyleType.Decimal}
+  } else if (node.name === 'ul') {
+    return {listStyleType: ListStyleType.Disc}
+  }
 }

@@ -16,6 +16,12 @@ const html = `
     <li>Second bulletpoint</li>
   </ul>
 </p>
+<ul>
+  <li><p>First bulletpoint</p></li>
+  <li><p>Second bulletpoint</p></li>
+</ul>
+<p />
+<p />
 <p>
   <ol>
     <li>First ordered</li>

@@ -1,4 +1,11 @@
 import { fromRgbString, hexColor } from '../utils/color.js';
+import { isTag } from 'domhandler';
+export var ListStyleType;
+(function (ListStyleType) {
+    ListStyleType[ListStyleType["None"] = 0] = "None";
+    ListStyleType[ListStyleType["Disc"] = 1] = "Disc";
+    ListStyleType[ListStyleType["Decimal"] = 2] = "Decimal";
+})(ListStyleType || (ListStyleType = {}));
 export function parseCssStyles(style) {
     const rules = style.split(';');
     const textStyle = {};
@@ -18,5 +25,16 @@ export function parseCssStyles(style) {
         }
     }
     return textStyle;
+}
+export function getNodeStyle(node) {
+    if (!isTag(node)) {
+        return;
+    }
+    if (node.name === 'ol') {
+        return { listStyleType: ListStyleType.Decimal };
+    }
+    else if (node.name === 'ul') {
+        return { listStyleType: ListStyleType.Disc };
+    }
 }
 //# sourceMappingURL=style.js.map
