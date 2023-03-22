@@ -19,7 +19,6 @@ export async function renderNode(
       return
     }
 
-    console.log('write html text with length', strippedText.length, strippedText)
     return doc.text(strippedText, options?.textStyle)
   }
 
@@ -36,7 +35,6 @@ export async function renderNode(
     const firstChildren = node.children[0]
 
     if (isText(firstChildren) && firstChildren.data === '\n') {
-      console.log('print empty p tag')
       doc.moveDown()
     }
   }

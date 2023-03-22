@@ -10,7 +10,6 @@ export async function renderNode(doc, node, options) {
         if (strippedText === '') {
             return;
         }
-        console.log('write html text with length', strippedText.length, strippedText);
         return doc.text(strippedText, options?.textStyle);
     }
     if (isTag(node) && node.name === 'img' && node.attribs.src?.match(/^data:.*;base64/)) {
@@ -23,7 +22,6 @@ export async function renderNode(doc, node, options) {
     if (isTag(node) && node.name === 'p' && node.children.length === 1) {
         const firstChildren = node.children[0];
         if (isText(firstChildren) && firstChildren.data === '\n') {
-            console.log('print empty p tag');
             doc.moveDown();
         }
     }
