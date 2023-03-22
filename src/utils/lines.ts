@@ -36,8 +36,7 @@ export const breakTextIntoLines = (
     currWidth = 0
   }
 
-  for (let idx = 0, len = words.length; idx < len; idx++) {
-    const word = words[idx]
+  for (const word of words) {
     if (isNewlineChar(word)) {
       pushCurrLine()
     } else {
@@ -47,6 +46,7 @@ export const breakTextIntoLines = (
       currWidth += width
     }
   }
+
   pushCurrLine()
 
   return lines
