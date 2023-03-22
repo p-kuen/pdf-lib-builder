@@ -14,8 +14,9 @@ export function getHtmlTextOptions(
   }
 
   const helveticaBold = builder.doc.embedStandardFont(StandardFonts.HelveticaBold)
+  const helveticaOblique = builder.doc.embedStandardFont(StandardFonts.HelveticaOblique)
 
-  const defaultTextStyles: PDFBuilderPageDrawTextOptions = {}
+  const defaultTextStyles: PDFBuilderPageDrawTextOptions = {lineBreak: lastNode}
 
   const defaultHeaderStyles: PDFBuilderPageDrawTextOptions = {
     ...defaultTextStyles,
@@ -57,6 +58,13 @@ export function getHtmlTextOptions(
       return {
         ...defaultTextStyles,
         font: helveticaBold,
+        lineBreak: false,
+      }
+    case 'em':
+      return {
+        ...defaultTextStyles,
+        font: helveticaOblique,
+        lineBreak: false,
       }
     default:
       return defaultTextStyles

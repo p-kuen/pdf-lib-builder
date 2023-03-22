@@ -20,8 +20,8 @@ const html = `
 <p />
 <p />
 <ol>
-  <li>First ordered</li>
-  <li>Second ordered</li>
+  <li>First <strong>bold</strong> ordered</li>
+  <li>Second <em>italic</em> ordered</li>
 </ol>
 <p />
 <p />

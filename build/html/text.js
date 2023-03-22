@@ -6,7 +6,8 @@ export function getHtmlTextOptions(builder, node, lastNode) {
         return {};
     }
     const helveticaBold = builder.doc.embedStandardFont(StandardFonts.HelveticaBold);
-    const defaultTextStyles = {};
+    const helveticaOblique = builder.doc.embedStandardFont(StandardFonts.HelveticaOblique);
+    const defaultTextStyles = { lineBreak: lastNode };
     const defaultHeaderStyles = {
         ...defaultTextStyles,
         lineBreak: lastNode,
@@ -45,6 +46,13 @@ export function getHtmlTextOptions(builder, node, lastNode) {
             return {
                 ...defaultTextStyles,
                 font: helveticaBold,
+                lineBreak: false,
+            };
+        case 'em':
+            return {
+                ...defaultTextStyles,
+                font: helveticaOblique,
+                lineBreak: false,
             };
         default:
             return defaultTextStyles;

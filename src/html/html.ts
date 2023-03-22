@@ -11,11 +11,9 @@ export async function renderNode(
   if (isText(node)) {
     // strip new lines and whitespace if text is not inside a pre tag and if parent tag is not root
     const strippedText =
-      node.parent && !(isTag(node.parent) && node.parent.name === 'pre')
-        ? node.data.replace(/\n/g, '').trim()
-        : node.data
+      node.parent && !(isTag(node.parent) && node.parent.name === 'pre') ? node.data.replace(/\n/g, '') : node.data
 
-    if (strippedText === '') {
+    if (strippedText.trim() === '') {
       return
     }
 
