@@ -66,6 +66,11 @@ export function getHtmlTextOptions(
         font: helveticaOblique,
         lineBreak: false,
       }
+    case 'a':
+      return {
+        ...defaultTextStyles,
+        lineBreak: false,
+      }
     default:
       return defaultTextStyles
   }

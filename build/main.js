@@ -1,8 +1,9 @@
-import { addRandomSuffix, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, PDFContentStream, PDFName, rgb, StandardFonts, TextAlignment, toRadians, radians, } from 'pdf-lib';
-import { breakTextIntoLines } from './utils/lines.js';
+import { addRandomSuffix, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, PDFContentStream, PDFName, rgb, StandardFonts, toRadians, radians, asNumber, } from 'pdf-lib';
 import { hexColor } from './utils/color.js';
 import { getNodeStyle } from './html/style.js';
 import { renderNode } from './html/html.js';
+import { createPageLinkAnnotation } from './utils/hyperlink.js';
+import { alignX, breakTextIntoLinesOfPage } from './utils/text.js';
 export var RectangleAlignment;
 (function (RectangleAlignment) {
     RectangleAlignment[RectangleAlignment["TopLeft"] = 0] = "TopLeft";
@@ -95,41 +96,13 @@ export class PDFDocumentBuilder {
         const fontSize = options.size || this.fontSize;
         const textWidth = (t) => font.widthOfTextAtSize(t, fontSize);
         const textStartPosition = options.x || this.page.getX();
-        let x = options.x || this.page.getX();
-        // Handle alignment
-        if (options.align) {
-            if (options.align === TextAlignment.Center) {
-                x -= textWidth(text) / 2;
-            }
-            else if (options.align === TextAlignment.Right) {
-                x -= textWidth(text);
-            }
-        }
-        const maxWidth = Math.min(options.maxWidth || Infinity, this.page.getWidth() - x - this.options.margins.right);
+        let x = alignX(text, options.x || this.page.getX(), font, fontSize, options?.align);
         // handle position options
         let originalY = this.y;
         if (options.y) {
             this.y = options.y;
         }
-        const wordBreaks = options.wordBreaks || this.doc.defaultWordBreaks;
-        const textLines = breakTextIntoLines(text, wordBreaks, (l) => (l === 1 ? maxWidth : options?.maxWidth ?? this.maxX - this.options.margins.left), textWidth);
-        const encodedLines = [];
-        let i = 0;
-        for (const text of textLines) {
-            // check if maxLines are exceeded
-            if (i === (options?.maxLines || Infinity)) {
-                break;
-            }
-            // if this is a cut off line add an ellipsis
-            if (i === (options?.maxLines || Infinity) - 1 && textLines.length > i + 1) {
-                const ellipsis = '…';
-                encodedLines.push(font.encodeText(breakTextIntoLines(text, wordBreaks, (l) => maxWidth - textWidth(ellipsis), textWidth)[0] + ellipsis));
-            }
-            else {
-                encodedLines.push(font.encodeText(text));
-            }
-            i++;
-        }
+        const { textLines, encodedLines } = breakTextIntoLinesOfPage(this, text, options);
         let contentStream = this.getContentStream();
         const color = options.color || this.fontColor;
         const rotate = options.rotate || degrees(0);
@@ -140,7 +113,7 @@ export class PDFDocumentBuilder {
             opacity: options.opacity,
             blendMode: options.blendMode,
         });
-        i = 0;
+        let i = 0;
         for (const line of encodedLines) {
             const isLastLine = i === encodedLines.length - 1;
             // Check if current line is beneath maxY. If so, switch to next page
@@ -156,18 +129,10 @@ export class PDFDocumentBuilder {
                     blendMode: options.blendMode,
                 });
             }
-            x = textStartPosition;
             // Handle alignment
-            if (options.align) {
-                if (options.align === TextAlignment.Center) {
-                    x -= textWidth(textLines[i]) / 2;
-                }
-                else if (options.align === TextAlignment.Right) {
-                    x -= textWidth(textLines[i]);
-                }
-            }
+            x = alignX(textLines[i], textStartPosition, font, fontSize, options?.align);
             this.page.moveDown(fontSize);
-            const operators = drawText(line, {
+            const drawTextOptions = {
                 color,
                 font: fontKey,
                 size: fontSize,
@@ -177,7 +142,11 @@ export class PDFDocumentBuilder {
                 x,
                 y: this.page.getY(),
                 graphicsState: graphicsStateKey,
-            });
+            };
+            const operators = drawText(line, drawTextOptions);
+            if (options?.afterLineDraw) {
+                options.afterLineDraw(textLines[i], font, drawTextOptions);
+            }
             // Move down the difference of lineHeight and font size to create a gap **after** the text
             if (options.lineBreak !== false || !isLastLine) {
                 this.page.moveDown(lineHeight - fontSize);
@@ -197,6 +166,34 @@ export class PDFDocumentBuilder {
         }
         if (options.font)
             this.setFont(originalFont);
+    }
+    link(link, options) {
+        const page = this.page;
+        const lineHeight = this.lineHeight;
+        const builder = this;
+        const linkColor = options?.color ?? hexColor('#3366CC');
+        this.text(options?.linkText ?? link, {
+            ...options,
+            color: linkColor,
+            afterLineDraw(lineText, font, options) {
+                const textWidth = font.widthOfTextAtSize(lineText, asNumber(options.size));
+                const linkAnnotation = createPageLinkAnnotation(page, link, {
+                    x: asNumber(options.x),
+                    y: asNumber(options.y),
+                    width: textWidth,
+                    height: lineHeight,
+                });
+                page.node.addAnnot(linkAnnotation);
+                const thickness = Math.round(asNumber(options.size) / 10);
+                const lineY = builder.convertY(asNumber(options.y)) + thickness + 2;
+                builder.line({
+                    start: { x: asNumber(options.x), y: lineY },
+                    end: { x: asNumber(options.x) + textWidth, y: lineY },
+                    color: linkColor,
+                    thickness,
+                });
+            },
+        });
     }
     async html(html) {
         const parser = await import('htmlparser2');

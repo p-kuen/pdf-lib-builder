@@ -21,7 +21,7 @@ const html = `
 <p />
 <ol>
   <li>First <strong>bold</strong> ordered</li>
-  <li>Second <em>italic</em> ordered</li>
+  <li><a href="https://pdf-lib.js.org/">PDF-Lib Link</a><em> italic</em> ordered</li>
 </ol>
 <p />
 <p />

@@ -17,6 +17,13 @@ export async function renderNode(
       return
     }
 
+    // if parent is a link tag, create a link text
+    const parentLinkTag = findParentElementWithTag(node, 'a')
+
+    if (parentLinkTag) {
+      return doc.link(parentLinkTag.attribs.href, {...options?.textStyle, linkText: strippedText})
+    }
+
     return doc.text(strippedText, options?.textStyle)
   }
 

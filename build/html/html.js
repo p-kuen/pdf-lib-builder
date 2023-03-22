@@ -8,6 +8,11 @@ export async function renderNode(doc, node, options) {
         if (strippedText.trim() === '') {
             return;
         }
+        // if parent is a link tag, create a link text
+        const parentLinkTag = findParentElementWithTag(node, 'a');
+        if (parentLinkTag) {
+            return doc.link(parentLinkTag.attribs.href, { ...options?.textStyle, linkText: strippedText });
+        }
         return doc.text(strippedText, options?.textStyle);
     }
     if (isTag(node) && node.name === 'img' && node.attribs.src?.match(/^data:.*;base64/)) {

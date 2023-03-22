@@ -46,8 +46,9 @@ This package supports experimental HTML rendering using the document builder met
 - Headers
 - Images
 - Lists (ordered and unordered)
-- strong-Tags (bold)
-- em-Tags (italic)
+- `strong`-Tags (bold)
+- `em`-Tags (italic)
+- `a` tags for links
 - Colors in style attribute
 
 If a tag is not supported yet, it is just ignored by the library.

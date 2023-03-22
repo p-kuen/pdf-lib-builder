@@ -54,6 +54,11 @@ export function getHtmlTextOptions(builder, node, lastNode) {
                 font: helveticaOblique,
                 lineBreak: false,
             };
+        case 'a':
+            return {
+                ...defaultTextStyles,
+                lineBreak: false,
+            };
         default:
             return defaultTextStyles;
     }

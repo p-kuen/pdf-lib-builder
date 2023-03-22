@@ -1,4 +1,4 @@
-import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment, Rotation } from 'pdf-lib';
+import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment, Rotation, DrawTextOptions } from 'pdf-lib';
 interface Margins {
     top: number;
     bottom: number;
@@ -39,6 +39,7 @@ export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
     lineBreak?: boolean;
     align?: TextAlignment;
     maxLines?: number;
+    afterLineDraw?: (lineText: string, font: PDFFont, options: DrawTextOptions) => void;
 }
 export interface PDFBuilderPageDrawRectangleOptions extends PDFPageDrawRectangleOptions {
     align?: RectangleAlignment;
@@ -72,6 +73,9 @@ export declare class PDFDocumentBuilder {
      * @param options
      */
     text(text: string, options?: PDFBuilderPageDrawTextOptions): void;
+    link(link: string, options?: PDFBuilderPageDrawTextOptions & {
+        linkText?: string;
+    }): void;
     html(html: string): Promise<void>;
     private renderHtmlDocument;
     private renderHtmlNode;
