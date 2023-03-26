@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": "p-kuen/pdf-lib-builder",
   "dependencies": {
-    "@patcher56/pdf-lib": "1.18.0-beta.2",
+    "@patcher56/pdf-lib": "1.18.0-beta.3",
     "domhandler": "^5.0.3",
     "file-type": "^18.2.1",
     "htmlparser2": "^8.0.1"

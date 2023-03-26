@@ -89,7 +89,7 @@ export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
   align?: TextAlignment
   maxLines?: number
   afterLineDraw?: (lineText: string, font: PDFFont, options: DrawTextOptions) => void
-  rotateOrigin?: PDFPageDrawTextOptions & 'bottomCenter'
+  rotateOrigin?: PDFPageDrawTextOptions['rotateOrigin'] & 'bottomCenter'
 }
 
 export interface PDFBuilderPageDrawRectangleOptions extends PDFPageDrawRectangleOptions {

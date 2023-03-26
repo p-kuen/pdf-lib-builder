@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@patcher56/pdf-lib': 1.18.0-beta.2
+  '@patcher56/pdf-lib': 1.18.0-beta.3
   '@types/node': ^18.15.5
   domhandler: ^5.0.3
   file-type: ^18.2.1
@@ -9,7 +9,7 @@ specifiers:
   typescript: ^5.0.2
 
 dependencies:
-  '@patcher56/pdf-lib': 1.18.0-beta.2
+  '@patcher56/pdf-lib': 1.18.0-beta.3
   domhandler: 5.0.3
   file-type: 18.2.1
   htmlparser2: 8.0.1
@@ -20,8 +20,8 @@ devDependencies:
 
 packages:
 
-  /@patcher56/pdf-lib/1.18.0-beta.2:
-    resolution: {integrity: sha512-XvQc+MssHxXtbZ/ehC+pR2J3PqCyY4sgVzh6JI/yZv/mXIzastd1xMIFwr12fV1VUeXasY8a/bDa+2DTVjFNZA==}
+  /@patcher56/pdf-lib/1.18.0-beta.3:
+    resolution: {integrity: sha512-PW3wmykR8CpToiC4bXzcngfReugx3B69M8ewLuOuEzq1paClS4KQwfjGC2lHOOoF1yI5M1PiSebMCZSKMSlRQQ==}
     dependencies:
       '@pdf-lib/standard-fonts': 1.0.0
       '@pdf-lib/upng': 1.0.1
