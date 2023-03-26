@@ -89,6 +89,7 @@ export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
   align?: TextAlignment
   maxLines?: number
   afterLineDraw?: (lineText: string, font: PDFFont, options: DrawTextOptions) => void
+  rotateOrigin?: PDFPageDrawTextOptions & 'bottomCenter'
 }
 
 export interface PDFBuilderPageDrawRectangleOptions extends PDFPageDrawRectangleOptions {
@@ -240,11 +241,21 @@ export class PDFDocumentBuilder {
 
       this.page.moveDown(fontSize)
 
+      let rotateOrigin: {x?: number; y?: number} | undefined =
+        typeof options?.rotateOrigin !== 'string' ? options.rotateOrigin : undefined
+
+      if (typeof options?.rotateOrigin === 'string') {
+        if (options.rotateOrigin === 'bottomCenter') {
+          rotateOrigin = {x: textWidth(textLines[i]) / 2}
+        }
+      }
+
       const drawTextOptions: DrawTextOptions = {
         color,
         font: fontKey,
         size: fontSize,
         rotate,
+        rotateOrigin,
         xSkew,
         ySkew,
         x,
