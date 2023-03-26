@@ -1,4 +1,4 @@
-import { TextAlignment } from 'pdf-lib';
+import { TextAlignment } from '@patcher56/pdf-lib';
 import { breakTextIntoLines } from './lines.js';
 export function alignX(text, x, font, fontSize, align) {
     if (!align) {

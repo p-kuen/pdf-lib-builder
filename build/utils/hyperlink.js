@@ -1,4 +1,4 @@
-import { PDFString } from 'pdf-lib';
+import { PDFString } from '@patcher56/pdf-lib';
 export const createPageLinkAnnotation = (page, uri, rect) => page.doc.context.register(page.doc.context.obj({
     Type: 'Annot',
     Subtype: 'Link',

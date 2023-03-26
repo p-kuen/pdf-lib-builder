@@ -1,4 +1,4 @@
-import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment, Rotation, DrawTextOptions } from 'pdf-lib';
+import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment, Rotation, DrawTextOptions } from '@patcher56/pdf-lib';
 interface Margins {
     top: number;
     bottom: number;
@@ -40,6 +40,7 @@ export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
     align?: TextAlignment;
     maxLines?: number;
     afterLineDraw?: (lineText: string, font: PDFFont, options: DrawTextOptions) => void;
+    rotateOrigin?: PDFPageDrawTextOptions & 'bottomCenter';
 }
 export interface PDFBuilderPageDrawRectangleOptions extends PDFPageDrawRectangleOptions {
     align?: RectangleAlignment;
@@ -95,7 +96,7 @@ export declare class PDFDocumentBuilder {
      * Resets the position to the top left of the page.
      */
     resetPosition(): void;
-    hexColor(hex: string): import("pdf-lib").RGB;
+    hexColor(hex: string): import("@patcher56/pdf-lib").RGB;
     switchToPage(index: number): void;
     addPage(): void;
     nextPage(options?: {

@@ -1,5 +1,5 @@
 import { isTag, isText } from 'domhandler';
-import { decodeFromBase64DataUri } from 'pdf-lib';
+import { decodeFromBase64DataUri } from '@patcher56/pdf-lib';
 import { ListStyleType } from './style.js';
 export async function renderNode(doc, node, options) {
     if (isText(node)) {

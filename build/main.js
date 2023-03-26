@@ -1,4 +1,4 @@
-import { addRandomSuffix, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, PDFContentStream, PDFName, rgb, StandardFonts, toRadians, radians, asNumber, } from 'pdf-lib';
+import { addRandomSuffix, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, PDFContentStream, PDFName, rgb, StandardFonts, toRadians, radians, asNumber, } from '@patcher56/pdf-lib';
 import { hexColor } from './utils/color.js';
 import { getNodeStyle } from './html/style.js';
 import { renderNode } from './html/html.js';
@@ -132,11 +132,18 @@ export class PDFDocumentBuilder {
             // Handle alignment
             x = alignX(textLines[i], textStartPosition, font, fontSize, options?.align);
             this.page.moveDown(fontSize);
+            let rotateOrigin = typeof options?.rotateOrigin !== 'string' ? options.rotateOrigin : undefined;
+            if (typeof options?.rotateOrigin === 'string') {
+                if (options.rotateOrigin === 'bottomCenter') {
+                    rotateOrigin = { x: textWidth(textLines[i]) / 2 };
+                }
+            }
             const drawTextOptions = {
                 color,
                 font: fontKey,
                 size: fontSize,
                 rotate,
+                rotateOrigin,
                 xSkew,
                 ySkew,
                 x,

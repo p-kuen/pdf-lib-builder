@@ -1,5 +1,5 @@
 import { isTag } from 'domhandler';
-import { StandardFonts } from 'pdf-lib';
+import { StandardFonts } from '@patcher56/pdf-lib';
 import { parseCssStyles } from './style.js';
 export function getHtmlTextOptions(builder, node, lastNode) {
     if (!isTag(node)) {
