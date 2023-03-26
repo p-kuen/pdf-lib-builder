@@ -1,6 +1,6 @@
 import type {ParentNode} from 'domhandler'
 import {isTag} from 'domhandler'
-import {StandardFonts} from 'pdf-lib'
+import {StandardFonts} from '@patcher56/pdf-lib'
 import PDFDocumentBuilder, {PDFBuilderPageDrawTextOptions} from '../main.js'
 import {parseCssStyles} from './style.js'
 

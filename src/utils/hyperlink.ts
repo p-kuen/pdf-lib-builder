@@ -1,4 +1,4 @@
-import {PDFPage, PDFString} from 'pdf-lib'
+import {PDFPage, PDFString} from '@patcher56/pdf-lib'
 
 export const createPageLinkAnnotation = (
   page: PDFPage,

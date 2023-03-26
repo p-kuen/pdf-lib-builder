@@ -1,5 +1,5 @@
 import {Element, isTag, isText, Node, Text} from 'domhandler'
-import {decodeFromBase64DataUri} from 'pdf-lib'
+import {decodeFromBase64DataUri} from '@patcher56/pdf-lib'
 import PDFDocumentBuilder, {PDFBuilderPageDrawTextOptions} from '../main.js'
 import {ListStyleType, StyleOptions} from './style.js'
 

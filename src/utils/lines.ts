@@ -1,4 +1,4 @@
-import {cleanText, escapedNewlineChars, escapeRegExp, isNewlineChar} from 'pdf-lib'
+import {cleanText, escapedNewlineChars, escapeRegExp, isNewlineChar} from '@patcher56/pdf-lib'
 
 const buildWordBreakRegex = (wordBreaks: string[]) => {
   const newlineCharUnion = escapedNewlineChars.join('|')

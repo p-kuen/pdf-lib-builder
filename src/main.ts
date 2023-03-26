@@ -33,7 +33,7 @@ import {
   PDFNumber,
   asPDFNumber,
   asNumber,
-} from 'pdf-lib'
+} from '@patcher56/pdf-lib'
 import {Node as HtmlNode, ParentNode as HtmlParentNode} from 'domhandler'
 import {breakTextIntoLines} from './utils/lines.js'
 import {hexColor} from './utils/color.js'

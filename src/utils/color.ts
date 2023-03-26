@@ -1,4 +1,4 @@
-import {rgb} from 'pdf-lib'
+import {rgb} from '@patcher56/pdf-lib'
 
 export function hexColor(hex: string) {
   const result = /^#?([a-f\d]{2})?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)

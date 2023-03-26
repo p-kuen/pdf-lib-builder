@@ -1,4 +1,4 @@
-import {PDFFont, TextAlignment} from 'pdf-lib'
+import {PDFFont, TextAlignment} from '@patcher56/pdf-lib'
 import PDFDocumentBuilder, {PDFBuilderPageDrawTextOptions} from '../main.js'
 import {breakTextIntoLines} from './lines.js'
 

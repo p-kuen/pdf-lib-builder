@@ -1,5 +1,5 @@
 import {createServer} from 'http'
-import {PDFDocument, radians, rgb, StandardFonts, TextAlignment, degrees, degreesToRadians} from 'pdf-lib'
+import {PDFDocument, radians, rgb, StandardFonts, TextAlignment, degrees, degreesToRadians} from '@patcher56/pdf-lib'
 import {request} from 'undici'
 import {PDFDocumentBuilder, RectangleAlignment} from 'pdf-lib-builder'
 
