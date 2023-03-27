@@ -13,11 +13,14 @@ export function getHtmlTextOptions(
     return {}
   }
 
+  const inlineElements = new Set(['strong', 'em', 's', 'a', 'u', 'span', 'small'])
+
   const helveticaBold = builder.doc.embedStandardFont(StandardFonts.HelveticaBold)
   const helveticaOblique = builder.doc.embedStandardFont(StandardFonts.HelveticaOblique)
 
   const defaultTextStyles: PDFBuilderPageDrawTextOptions = {lineBreak: lastNode}
 
+  const inlineTextStyles = {...defaultTextStyles, lineBreak: false}
   const defaultHeaderStyles: PDFBuilderPageDrawTextOptions = {
     ...defaultTextStyles,
     lineBreak: lastNode,
@@ -56,22 +59,26 @@ export function getHtmlTextOptions(
       }
     case 'strong':
       return {
-        ...defaultTextStyles,
+        ...inlineTextStyles,
         font: helveticaBold,
         lineBreak: false,
       }
     case 'em':
       return {
-        ...defaultTextStyles,
+        ...inlineTextStyles,
         font: helveticaOblique,
         lineBreak: false,
       }
     case 'a':
       return {
-        ...defaultTextStyles,
+        ...inlineTextStyles,
         lineBreak: false,
       }
     default:
-      return defaultTextStyles
+      if (inlineElements.has(node.name)) {
+        return inlineTextStyles
+      } else {
+        return defaultTextStyles
+      }
   }
 }
