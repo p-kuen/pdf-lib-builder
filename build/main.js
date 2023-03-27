@@ -115,6 +115,7 @@ export class PDFDocumentBuilder {
         });
         let i = 0;
         for (const line of encodedLines) {
+            const isFirstLine = i === 0;
             const isLastLine = i === encodedLines.length - 1;
             // Check if current line is beneath maxY. If so, switch to next page
             if (options.y === undefined && this.y + fontSize > this.maxY) {
@@ -129,8 +130,16 @@ export class PDFDocumentBuilder {
                     blendMode: options.blendMode,
                 });
             }
+            x = textStartPosition;
+            // if first line does not fit on the page width, do a line break
+            if (isFirstLine && !options.x && x + textWidth(textLines[i]) >= this.maxX) {
+                // move down only the line height factor
+                this.moveDown();
+                x = this.options.margins.left;
+                this.x = x;
+            }
             // Handle alignment
-            x = alignX(textLines[i], textStartPosition, font, fontSize, options?.align);
+            x = alignX(textLines[i], x, font, fontSize, options?.align);
             this.page.moveDown(fontSize);
             let rotateOrigin = typeof options?.rotateOrigin !== 'string' ? options.rotateOrigin : undefined;
             if (typeof options?.rotateOrigin === 'string') {
@@ -154,12 +163,16 @@ export class PDFDocumentBuilder {
             if (options?.afterLineDraw) {
                 options.afterLineDraw(textLines[i], font, drawTextOptions);
             }
+            // Handle line breaks after a line drawing.
             // Move down the difference of lineHeight and font size to create a gap **after** the text
             if (options.lineBreak !== false || !isLastLine) {
+                // move down only the line height factor
                 this.page.moveDown(lineHeight - fontSize);
                 this.x = this.options.margins.left;
             }
             else {
+                // we have to move up the fontSize, because we move down the font size in the next text call
+                // this strange behaviour is necessary because it is possible to use multiple font sizes
                 this.page.moveUp(fontSize);
                 if (!options.x) {
                     this.x = this.page.getX() + textWidth(textLines[i]);
