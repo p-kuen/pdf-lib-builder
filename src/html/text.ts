@@ -20,15 +20,16 @@ export function getHtmlTextOptions(
 
   const defaultTextStyles: PDFBuilderPageDrawTextOptions = {lineBreak: lastNode}
 
+  // Handle styles
+  if (node.attribs?.style) {
+    Object.assign(defaultTextStyles, parseCssStyles(node.attribs.style))
+  }
+
   const inlineTextStyles = {...defaultTextStyles, lineBreak: false}
   const defaultHeaderStyles: PDFBuilderPageDrawTextOptions = {
     ...defaultTextStyles,
     lineBreak: lastNode,
     font: helveticaBold,
-  }
-
-  if (node.attribs?.style) {
-    Object.assign(defaultTextStyles, parseCssStyles(node.attribs.style))
   }
 
   switch (node.name) {

@@ -9,15 +9,16 @@ export function getHtmlTextOptions(builder, node, lastNode) {
     const helveticaBold = builder.doc.embedStandardFont(StandardFonts.HelveticaBold);
     const helveticaOblique = builder.doc.embedStandardFont(StandardFonts.HelveticaOblique);
     const defaultTextStyles = { lineBreak: lastNode };
+    // Handle styles
+    if (node.attribs?.style) {
+        Object.assign(defaultTextStyles, parseCssStyles(node.attribs.style));
+    }
     const inlineTextStyles = { ...defaultTextStyles, lineBreak: false };
     const defaultHeaderStyles = {
         ...defaultTextStyles,
         lineBreak: lastNode,
         font: helveticaBold,
     };
-    if (node.attribs?.style) {
-        Object.assign(defaultTextStyles, parseCssStyles(node.attribs.style));
-    }
     switch (node.name) {
         case 'p':
             return {
