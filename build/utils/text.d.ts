@@ -1,5 +1,6 @@
 import { PDFFont, TextAlignment } from '@patcher56/pdf-lib';
-import PDFDocumentBuilder, { PDFBuilderPageDrawTextOptions } from '../main.js';
+import PDFDocumentBuilder from '../main.js';
+import { PDFBuilderPageDrawTextOptions } from '../plugins/text.js';
 export declare function alignX(text: string, x: number, font: PDFFont, fontSize: number, align?: TextAlignment): number;
 export declare function breakTextIntoLinesOfPage(builder: PDFDocumentBuilder, text: string, options?: Pick<PDFBuilderPageDrawTextOptions, 'wordBreaks' | 'maxWidth' | 'maxLines' | 'size'>): {
     textLines: string[];

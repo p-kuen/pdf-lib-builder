@@ -1,8 +1,9 @@
 import type {ParentNode} from 'domhandler'
 import {isTag} from 'domhandler'
 import {StandardFonts} from '@patcher56/pdf-lib'
-import PDFDocumentBuilder, {PDFBuilderPageDrawTextOptions} from '../main.js'
+import PDFDocumentBuilder from '../main.js'
 import {parseCssStyles} from './style.js'
+import {PDFBuilderPageDrawTextOptions} from '../plugins/text.js'
 
 export function getHtmlTextOptions(
   builder: PDFDocumentBuilder,

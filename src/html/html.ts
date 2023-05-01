@@ -1,7 +1,23 @@
-import {Element, isTag, isText, Node, Text} from 'domhandler'
+import {Element, isTag, isText, Node, ParentNode, Text} from 'domhandler'
 import {decodeFromBase64DataUri} from '@patcher56/pdf-lib'
-import PDFDocumentBuilder, {PDFBuilderPageDrawTextOptions} from '../main.js'
-import {ListStyleType, StyleOptions} from './style.js'
+import PDFDocumentBuilder from '../main.js'
+import {getNodeStyle, ListStyleType, StyleOptions} from './style.js'
+import {PDFBuilderPageDrawTextOptions} from '../plugins/text.js'
+
+export async function renderHtmlDocument(
+  doc: PDFDocumentBuilder,
+  node: ParentNode,
+  options?: {style?: StyleOptions; textStyle?: PDFBuilderPageDrawTextOptions}
+) {
+  let i = 0
+  for (const child of node.children) {
+    await renderHtmlNode(doc, child, {
+      lastNode: ++i === node.children.length,
+      style: options?.style,
+      textStyle: options?.textStyle,
+    })
+  }
+}
 
 export async function renderNode(
   doc: PDFDocumentBuilder,
@@ -42,6 +58,30 @@ export async function renderNode(
     if (isText(firstChildren) && firstChildren.data === '\n') {
       doc.moveDown()
     }
+  }
+}
+
+async function renderHtmlNode(
+  doc: PDFDocumentBuilder,
+  node: Node,
+  options?: {lastNode?: boolean; style?: StyleOptions; textStyle?: PDFBuilderPageDrawTextOptions}
+) {
+  const domhandler = await import('domhandler')
+  const htmlText = await import('../html/text.js')
+  const style = Object.assign({}, options?.style, getNodeStyle(node))
+
+  const textStyle = Object.assign(
+    {},
+    options?.textStyle ?? {},
+    node.parent ? htmlText.getHtmlTextOptions(doc, node.parent, options?.lastNode) : undefined
+  )
+
+  const newOptions = {...options, textStyle, style}
+
+  await renderNode(doc, node, newOptions)
+
+  if (domhandler.hasChildren(node)) {
+    await renderHtmlDocument(doc, node, newOptions)
   }
 }
 

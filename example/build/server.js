@@ -2,6 +2,7 @@ import { createServer } from 'http';
 import { PDFDocument, radians, rgb, StandardFonts, TextAlignment, degrees, degreesToRadians } from '@patcher56/pdf-lib';
 import { request } from 'undici';
 import { PDFDocumentBuilder, RectangleAlignment } from 'pdf-lib-builder';
+// import {TextPlugin} from 'pdf-lib-builder/build/plugins/text.js'
 const port = 4000;
 const html = `
 <h1>My First Heading</h1>

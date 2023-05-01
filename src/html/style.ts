@@ -1,4 +1,4 @@
-import {PDFBuilderPageDrawTextOptions} from '../main.js'
+import {PDFPageDrawTextOptions} from '@patcher56/pdf-lib'
 import {fromRgbString, hexColor} from '../utils/color.js'
 import {isTag, Node} from 'domhandler'
 
@@ -15,7 +15,7 @@ export type StyleOptions = {
 export function parseCssStyles(style: string) {
   const rules = style.split(';')
 
-  const textStyle: PDFBuilderPageDrawTextOptions = {}
+  const textStyle: PDFPageDrawTextOptions = {}
 
   for (const rule of rules) {
     const parsedRule = rule.match(/(.*):\s*(.*)/)

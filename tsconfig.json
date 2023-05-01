@@ -3,7 +3,7 @@
     "sourceMap": true, // allow sourcemap support
     "strictNullChecks": true, // enable strict null checks as a best practice
     "strict": true,
-    "target": "esnext", // specify ECMAScript target version
+    "target": "ES2022", // specify ECMAScript target version
     "module": "es2020",
     "moduleResolution": "Node16",
     "noImplicitAny": true,

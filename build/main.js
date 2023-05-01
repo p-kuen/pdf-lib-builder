@@ -1,9 +1,9 @@
-import { addRandomSuffix, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, drawText, PDFContentStream, PDFName, rgb, StandardFonts, toRadians, radians, asNumber, } from '@patcher56/pdf-lib';
+import { addRandomSuffix, degrees, drawEllipse, drawImage, drawLine, drawRectangle, drawSvgPath, PDFContentStream, PDFName, rgb, StandardFonts, toRadians, radians, } from '@patcher56/pdf-lib';
 import { hexColor } from './utils/color.js';
-import { getNodeStyle } from './html/style.js';
-import { renderNode } from './html/html.js';
-import { createPageLinkAnnotation } from './utils/hyperlink.js';
-import { alignX, breakTextIntoLinesOfPage } from './utils/text.js';
+import { PluginBase } from './plugin.js';
+import { textPlugin } from './plugins/text.js';
+import { linkPlugin } from './plugins/link.js';
+import { htmlPlugin } from './plugins/html.js';
 export var RectangleAlignment;
 (function (RectangleAlignment) {
     RectangleAlignment[RectangleAlignment["TopLeft"] = 0] = "TopLeft";
@@ -23,12 +23,12 @@ export function rotatePoint(point, rotation) {
         y: point.x * Math.sin(rad) + point.y * Math.cos(rad),
     };
 }
-export class PDFDocumentBuilder {
+class PDFDocumentBuilder extends PluginBase {
     doc;
     page;
     options;
     font;
-    fontKey;
+    #fontKey;
     fontSize = 24;
     fontColor = rgb(0, 0, 0);
     /** The factor a line is larger than it's font size */
@@ -36,7 +36,9 @@ export class PDFDocumentBuilder {
     pageIndex = 0;
     contentStream;
     contentStreamRef;
+    static plugins = [textPlugin, linkPlugin, htmlPlugin];
     constructor(doc, options) {
+        super();
         this.doc = doc;
         this.font = this.doc.embedStandardFont(StandardFonts.Helvetica);
         // If there is no page in the document, create one
@@ -58,15 +60,15 @@ export class PDFDocumentBuilder {
     }
     setFont(font) {
         this.font = font;
-        this.fontKey = addRandomSuffix(this.font.name);
-        this.page.node.setFontDictionary(PDFName.of(this.fontKey), this.font.ref);
+        this.#fontKey = addRandomSuffix(this.font.name);
+        this.page.node.setFontDictionary(PDFName.of(this.#fontKey), this.font.ref);
     }
     getFont() {
-        if (!this.font || !this.fontKey) {
+        if (!this.font || !this.#fontKey) {
             const font = this.doc.embedStandardFont(StandardFonts.Helvetica);
             this.setFont(font);
         }
-        return [this.font, this.fontKey];
+        return [this.font, this.#fontKey];
     }
     setFontSize(size) {
         this.fontSize = size;
@@ -75,171 +77,6 @@ export class PDFDocumentBuilder {
     setLineHeight(lineHeight) {
         this.lineHeightFactor = lineHeight / this.fontSize;
         this.page.setLineHeight(lineHeight);
-    }
-    /**
-     * Draw one or more lines of text on this page
-     * Origin for position is the top left of the text depending on TextAlignment.
-     * Origin for rotation is the bottom left of the text depending on TextAlignment.
-     * @see drawText
-     * @param text
-     * @param options
-     */
-    text(text, options) {
-        const defaultOptions = {
-            maxWidth: Infinity,
-        };
-        options = Object.assign(defaultOptions, options);
-        const [originalFont] = this.getFont();
-        if (options.font)
-            this.setFont(options.font);
-        let [font, fontKey] = this.getFont();
-        const fontSize = options.size || this.fontSize;
-        const textWidth = (t) => font.widthOfTextAtSize(t, fontSize);
-        const textStartPosition = options.x || this.page.getX();
-        let x = alignX(text, options.x || this.page.getX(), font, fontSize, options?.align);
-        // handle position options
-        let originalY = this.y;
-        if (options.y) {
-            this.y = options.y;
-        }
-        const { textLines, encodedLines } = breakTextIntoLinesOfPage(this, text, options);
-        let contentStream = this.getContentStream();
-        const color = options.color || this.fontColor;
-        const rotate = options.rotate || degrees(0);
-        const xSkew = options.xSkew || degrees(0);
-        const ySkew = options.ySkew || degrees(0);
-        const lineHeight = options.lineHeight || fontSize * this.lineHeightFactor;
-        let graphicsStateKey = this.maybeEmbedGraphicsState({
-            opacity: options.opacity,
-            blendMode: options.blendMode,
-        });
-        let i = 0;
-        for (const line of encodedLines) {
-            const isFirstLine = i === 0;
-            const isLastLine = i === encodedLines.length - 1;
-            // Check if current line is beneath maxY. If so, switch to next page
-            if (options.y === undefined && this.y + fontSize > this.maxY) {
-                this.nextPage();
-                // Add font to directory on the new page and get the font key
-                this.setFont(font);
-                [font, fontKey] = this.getFont();
-                this.setFontSize(this.fontSize);
-                contentStream = this.getContentStream(false);
-                graphicsStateKey = this.maybeEmbedGraphicsState({
-                    opacity: options.opacity,
-                    blendMode: options.blendMode,
-                });
-            }
-            x = textStartPosition;
-            // if first line does not fit on the page width, do a line break
-            if (isFirstLine && !options.x && x + textWidth(textLines[i]) >= this.maxX) {
-                // move down only the line height factor
-                this.moveDown();
-                x = this.options.margins.left;
-                this.x = x;
-            }
-            // Handle alignment
-            x = alignX(textLines[i], x, font, fontSize, options?.align);
-            this.page.moveDown(fontSize);
-            let rotateOrigin = typeof options?.rotateOrigin !== 'string' ? options.rotateOrigin : undefined;
-            if (typeof options?.rotateOrigin === 'string') {
-                if (options.rotateOrigin === 'bottomCenter') {
-                    rotateOrigin = { x: textWidth(textLines[i]) / 2 };
-                }
-            }
-            const drawTextOptions = {
-                color,
-                font: fontKey,
-                size: fontSize,
-                rotate,
-                rotateOrigin,
-                xSkew,
-                ySkew,
-                x,
-                y: this.page.getY(),
-                graphicsState: graphicsStateKey,
-            };
-            const operators = drawText(line, drawTextOptions);
-            if (options?.afterLineDraw) {
-                options.afterLineDraw(textLines[i], font, drawTextOptions);
-            }
-            // Handle line breaks after a line drawing.
-            // Move down the difference of lineHeight and font size to create a gap **after** the text
-            if (options.lineBreak !== false || !isLastLine) {
-                // move down only the line height factor
-                this.page.moveDown(lineHeight - fontSize);
-                this.x = this.options.margins.left;
-            }
-            else {
-                // we have to move up the fontSize, because we move down the font size in the next text call
-                // this strange behaviour is necessary because it is possible to use multiple font sizes
-                this.page.moveUp(fontSize);
-                if (!options.x) {
-                    this.x = this.page.getX() + textWidth(textLines[i]);
-                }
-            }
-            contentStream.push(...operators);
-            i++;
-        }
-        if (options.y) {
-            this.y = originalY;
-        }
-        if (options.font)
-            this.setFont(originalFont);
-    }
-    link(link, options) {
-        const page = this.page;
-        const lineHeight = this.lineHeight;
-        const builder = this;
-        const linkColor = options?.color ?? hexColor('#3366CC');
-        this.text(options?.linkText ?? link, {
-            ...options,
-            color: linkColor,
-            afterLineDraw(lineText, font, options) {
-                const textWidth = font.widthOfTextAtSize(lineText, asNumber(options.size));
-                const linkAnnotation = createPageLinkAnnotation(page, link, {
-                    x: asNumber(options.x),
-                    y: asNumber(options.y),
-                    width: textWidth,
-                    height: lineHeight,
-                });
-                page.node.addAnnot(linkAnnotation);
-                const thickness = Math.round(asNumber(options.size) / 10);
-                const lineY = builder.convertY(asNumber(options.y)) + thickness + 2;
-                builder.line({
-                    start: { x: asNumber(options.x), y: lineY },
-                    end: { x: asNumber(options.x) + textWidth, y: lineY },
-                    color: linkColor,
-                    thickness,
-                });
-            },
-        });
-    }
-    async html(html) {
-        const parser = await import('htmlparser2');
-        const parsed = parser.parseDocument(html, {});
-        await this.renderHtmlDocument(parsed);
-    }
-    async renderHtmlDocument(doc, options) {
-        let i = 0;
-        for (const child of doc.children) {
-            await this.renderHtmlNode(child, {
-                lastNode: ++i === doc.children.length,
-                style: options?.style,
-                textStyle: options?.textStyle,
-            });
-        }
-    }
-    async renderHtmlNode(node, options) {
-        const domhandler = await import('domhandler');
-        const htmlText = await import('./html/text.js');
-        const style = Object.assign({}, options?.style, getNodeStyle(node));
-        const textStyle = Object.assign({}, options?.textStyle ?? {}, node.parent ? htmlText.getHtmlTextOptions(this, node.parent, options?.lastNode) : undefined);
-        const newOptions = { ...options, textStyle, style };
-        await renderNode(this, node, newOptions);
-        if (domhandler.hasChildren(node)) {
-            await this.renderHtmlDocument(node, newOptions);
-        }
     }
     async image(input, options) {
         let image;
@@ -507,12 +344,12 @@ export class PDFDocumentBuilder {
     getContentStream(useExisting = true) {
         if (useExisting && this.contentStream)
             return this.contentStream;
-        this.contentStream = this.createContentStream();
+        this.contentStream = this.#createContentStream();
         this.contentStreamRef = this.doc.context.register(this.contentStream);
         this.page.node.addContentStream(this.contentStreamRef);
         return this.contentStream;
     }
-    createContentStream(...operators) {
+    #createContentStream(...operators) {
         const dict = this.doc.context.obj({});
         const contentStream = PDFContentStream.of(dict, operators);
         return contentStream;
@@ -533,5 +370,6 @@ export class PDFDocumentBuilder {
         return key;
     }
 }
+export { PDFDocumentBuilder };
 export default PDFDocumentBuilder;
 //# sourceMappingURL=main.js.map

@@ -1,4 +1,8 @@
-import { Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFPageDrawTextOptions, PDFRef, TextAlignment, Rotation, DrawTextOptions } from '@patcher56/pdf-lib';
+import { BlendMode, Color, PDFContentStream, PDFDocument, PDFFont, PDFImage, PDFPage, PDFPageDrawEllipseOptions, PDFPageDrawImageOptions, PDFPageDrawLineOptions, PDFPageDrawRectangleOptions, PDFPageDrawSVGOptions, PDFRef, Rotation } from '@patcher56/pdf-lib';
+import { PluginBase } from './plugin.js';
+import './plugins/text.js';
+import './plugins/link.js';
+import './plugins/html.js';
 interface Margins {
     top: number;
     bottom: number;
@@ -35,23 +39,16 @@ export interface PDFBuilderPageDrawImageOptions extends PDFPageDrawImageOptions 
     align?: AlignSetting;
     onLoad?: (image: PDFImage) => void;
 }
-export interface PDFBuilderPageDrawTextOptions extends PDFPageDrawTextOptions {
-    lineBreak?: boolean;
-    align?: TextAlignment;
-    maxLines?: number;
-    afterLineDraw?: (lineText: string, font: PDFFont, options: DrawTextOptions) => void;
-    rotateOrigin?: PDFPageDrawTextOptions['rotateOrigin'] & 'bottomCenter';
-}
 export interface PDFBuilderPageDrawRectangleOptions extends PDFPageDrawRectangleOptions {
     align?: RectangleAlignment;
 }
 export declare function rotatePoint(point: Point, rotation: Rotation): Point;
-export declare class PDFDocumentBuilder {
+export declare class PDFDocumentBuilder extends PluginBase {
+    #private;
     doc: PDFDocument;
     page: PDFPage;
     options: PDFDocumentBuilderOptions;
     font: PDFFont;
-    private fontKey?;
     fontSize: number;
     fontColor: Color;
     /** The factor a line is larger than it's font size */
@@ -59,27 +56,21 @@ export declare class PDFDocumentBuilder {
     pageIndex: number;
     contentStream?: PDFContentStream;
     contentStreamRef?: PDFRef;
+    protected static plugins: (import("./plugin.js").PluginConfig<{
+        html(this: PDFDocumentBuilder, html: string): Promise<void>;
+    }> | import("./plugin.js").PluginConfig<{
+        text(this: PDFDocumentBuilder, text: string, options?: import("./plugins/text.js").PDFBuilderPageDrawTextOptions | undefined): void;
+    }> | import("./plugin.js").PluginConfig<{
+        link(this: PDFDocumentBuilder, link: string, options?: (import("./plugins/text.js").PDFBuilderPageDrawTextOptions & {
+            linkText?: string | undefined;
+        }) | undefined): void;
+    }>)[];
     constructor(doc: PDFDocument, options?: Partial<PDFDocumentBuilderOptions>);
     moveDown(lines?: number): void;
     setFont(font: PDFFont): void;
     getFont(): [PDFFont, string];
     setFontSize(size: number): void;
     setLineHeight(lineHeight: number): void;
-    /**
-     * Draw one or more lines of text on this page
-     * Origin for position is the top left of the text depending on TextAlignment.
-     * Origin for rotation is the bottom left of the text depending on TextAlignment.
-     * @see drawText
-     * @param text
-     * @param options
-     */
-    text(text: string, options?: PDFBuilderPageDrawTextOptions): void;
-    link(link: string, options?: PDFBuilderPageDrawTextOptions & {
-        linkText?: string;
-    }): void;
-    html(html: string): Promise<void>;
-    private renderHtmlDocument;
-    private renderHtmlNode;
     image(input: Uint8Array | ArrayBuffer | PDFImage, options?: PDFBuilderPageDrawImageOptions): Promise<PDFImage>;
     rect(options: PDFBuilderPageDrawRectangleOptions): void;
     /**
@@ -103,7 +94,7 @@ export declare class PDFDocumentBuilder {
         keepPosition: boolean;
     }): void;
     setFontColor(fontColor: Color): void;
-    private convertY;
+    convertY(y: number): number;
     get lineHeight(): number;
     get isLastPage(): boolean;
     get x(): number;
@@ -123,7 +114,10 @@ export declare class PDFDocumentBuilder {
      */
     get maxY(): number;
     getContentStream(useExisting?: boolean): PDFContentStream;
-    private createContentStream;
-    private maybeEmbedGraphicsState;
+    maybeEmbedGraphicsState(options: {
+        opacity?: number;
+        borderOpacity?: number;
+        blendMode?: BlendMode;
+    }): string | undefined;
 }
 export default PDFDocumentBuilder;

@@ -1,6 +1,16 @@
 import { isTag, isText } from 'domhandler';
 import { decodeFromBase64DataUri } from '@patcher56/pdf-lib';
-import { ListStyleType } from './style.js';
+import { getNodeStyle, ListStyleType } from './style.js';
+export async function renderHtmlDocument(doc, node, options) {
+    let i = 0;
+    for (const child of node.children) {
+        await renderHtmlNode(doc, child, {
+            lastNode: ++i === node.children.length,
+            style: options?.style,
+            textStyle: options?.textStyle,
+        });
+    }
+}
 export async function renderNode(doc, node, options) {
     if (isText(node)) {
         // strip new lines and whitespace if text is not inside a pre tag and if parent tag is not root
@@ -27,6 +37,17 @@ export async function renderNode(doc, node, options) {
         if (isText(firstChildren) && firstChildren.data === '\n') {
             doc.moveDown();
         }
+    }
+}
+async function renderHtmlNode(doc, node, options) {
+    const domhandler = await import('domhandler');
+    const htmlText = await import('../html/text.js');
+    const style = Object.assign({}, options?.style, getNodeStyle(node));
+    const textStyle = Object.assign({}, options?.textStyle ?? {}, node.parent ? htmlText.getHtmlTextOptions(doc, node.parent, options?.lastNode) : undefined);
+    const newOptions = { ...options, textStyle, style };
+    await renderNode(doc, node, newOptions);
+    if (domhandler.hasChildren(node)) {
+        await renderHtmlDocument(doc, node, newOptions);
     }
 }
 function renderListNode(doc, node, options) {
