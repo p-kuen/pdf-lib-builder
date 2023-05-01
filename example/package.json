@@ -11,12 +11,12 @@
   "author": "Patrick Kuen <p.kuen@cloudacy.com>",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^18.15.5",
-    "tsc-watch": "^6.0.0",
-    "typescript": "^5.0.2"
+    "@types/node": "^18.16.3",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "pdf-lib-builder": "link:..",
-    "undici": "^5.21.0"
+    "undici": "^5.22.0"
   }
 }

@@ -16,11 +16,11 @@
   "dependencies": {
     "@patcher56/pdf-lib": "1.18.0-beta.3",
     "domhandler": "^5.0.3",
-    "file-type": "^18.2.1",
-    "htmlparser2": "^8.0.1"
+    "file-type": "^18.3.0",
+    "htmlparser2": "^8.0.2"
   },
   "devDependencies": {
-    "@types/node": "^18.15.5",
-    "typescript": "^5.0.2"
+    "@types/node": "^18.16.3",
+    "typescript": "^5.0.4"
   }
 }
