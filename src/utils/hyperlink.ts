@@ -1,10 +1,10 @@
-import {PDFPage, PDFString} from '@patcher56/pdf-lib'
+import {PDFPage, PDFRef, PDFString} from '@patcher56/pdf-lib'
 
 export const createPageLinkAnnotation = (
   page: PDFPage,
   uri: string,
   rect: {x: number; y: number; width: number; height: number}
-) =>
+): PDFRef =>
   page.doc.context.register(
     page.doc.context.obj({
       Type: 'Annot',

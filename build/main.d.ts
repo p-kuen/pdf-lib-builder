@@ -57,13 +57,13 @@ export declare class PDFDocumentBuilder extends PluginBase {
     contentStream?: PDFContentStream;
     contentStreamRef?: PDFRef;
     protected static plugins: (import("./plugin.js").PluginConfig<{
-        html(this: PDFDocumentBuilder, html: string): Promise<void>;
-    }> | import("./plugin.js").PluginConfig<{
         text(this: PDFDocumentBuilder, text: string, options?: import("./plugins/text.js").PDFBuilderPageDrawTextOptions | undefined): void;
     }> | import("./plugin.js").PluginConfig<{
         link(this: PDFDocumentBuilder, link: string, options?: (import("./plugins/text.js").PDFBuilderPageDrawTextOptions & {
             linkText?: string | undefined;
         }) | undefined): void;
+    }> | import("./plugin.js").PluginConfig<{
+        html(this: PDFDocumentBuilder, html: string): Promise<void>;
     }>)[];
     constructor(doc: PDFDocument, options?: Partial<PDFDocumentBuilderOptions>);
     moveDown(lines?: number): void;
