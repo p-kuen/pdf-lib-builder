@@ -183,7 +183,7 @@ function breakTextIntoLinesOfPage(
   const textLines = breakTextIntoLines(
     text,
     wordBreaks,
-    (l) => (l === 1 ? maxWidth : Math.min(options?.maxWidth ?? Infinity, builder.maxX - builder.options.margins.right)),
+    (lineNumber) => (lineNumber === 1 ? maxWidth : Math.min(maxWidth, builder.maxX - builder.options.margins.right)),
     textWidth
   )
 

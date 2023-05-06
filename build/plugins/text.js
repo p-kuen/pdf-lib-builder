@@ -134,7 +134,7 @@ function breakTextIntoLinesOfPage(builder, text, options) {
     const maxWidth = Math.min(options?.maxWidth || Infinity, builder.page.getWidth() - builder.x - builder.options.margins.right);
     const fontSize = options?.size || builder.fontSize;
     const textWidth = (t) => builder.font.widthOfTextAtSize(t, fontSize);
-    const textLines = breakTextIntoLines(text, wordBreaks, (l) => (l === 1 ? maxWidth : Math.min(options?.maxWidth ?? Infinity, builder.maxX - builder.options.margins.right)), textWidth);
+    const textLines = breakTextIntoLines(text, wordBreaks, (lineNumber) => (lineNumber === 1 ? maxWidth : Math.min(maxWidth, builder.maxX - builder.options.margins.right)), textWidth);
     const encodedLines = [];
     let i = 0;
     for (const text of textLines) {
