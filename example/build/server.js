@@ -81,6 +81,11 @@ createServer(async (req, res) => {
     builder.text('Image align right:');
     builder.image(image, { fit: { height: 50 }, align: 'right' });
     builder.moveDown();
+    // PNG image
+    const pngUrl = 'https://pdf-lib.js.org/assets/small_mario.png';
+    const pngBuffer = await request(pngUrl).then((res) => res.body.arrayBuffer());
+    const pngImage = await doc.embedPng(pngBuffer);
+    builder.image(pngImage, { x: 120, y: 10, fit: { height: 100 }, opacity: 0.2 });
     builder.text('This should show on next page with automatic wrapping');
     builder.text('This should not break', { lineBreak: false });
     builder.text('This should be placed right next to the previous line and should break');
