@@ -2,6 +2,9 @@
 
 This is an automatic page creation library for [pdf-lib](https://github.com/Hopding/pdf-lib). It is thought to be an alternative to [pdfkit](https://github.com/foliojs/pdfkit) for users that actually had to use both of the libraries (like me 😅).
 
+> [!WARNING]
+> This package is not maintained anymore because it is not used in production anymore. Please find an alternative.
+
 ## Example
 
 Please look at the [example](https://github.com/Patcher56/pdf-lib-builder/tree/main/example) folder for a fully working example with a simple node server.
